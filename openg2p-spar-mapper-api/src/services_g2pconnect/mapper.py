@@ -3,22 +3,20 @@ from datetime import datetime
 
 from openg2p_fastapi_common.context import dbengine
 from openg2p_fastapi_common.service import BaseService
-from sqlalchemy.ext.asyncio import async_sessionmaker
 from openg2p_g2pconnect_common_lib.common.schemas import (
     SyncRequest,
     StatusEnum,
 )
-
 from openg2p_g2pconnect_common_lib.spar.schemas import (
     SingleLinkResponse,
     LinkRequest,
 )
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from ..config import Settings
 from ..models.orm.id_fa_mapping import IdFaMapping
-from ..services.exceptions import IdFaMappingValidationException
-from ..services.id_fa_mapping_validations import IdFaMappingValidations
-
+from ..services_g2pconnect.exceptions import LinkValidationException
+from ..services_g2pconnect.id_fa_mapping_validations import IdFaMappingValidations
 
 _config = Settings.get_config()
 _logger = logging.getLogger(_config.logging_default_logger_name)
@@ -36,7 +34,7 @@ class MapperService(BaseService):
             for single_link_request in linkRequest.link_request:
 
                 try:
-                    IdFaMappingValidations.get_component().validate_link_request(
+                    await IdFaMappingValidations.get_component().validate_link_request(
                         connection=session, single_link_request=single_link_request
                     )
 
@@ -49,7 +47,7 @@ class MapperService(BaseService):
                         )
                     )
 
-                except IdFaMappingValidationException as e:
+                except LinkValidationException as e:
                     single_link_responses.append(
                         self.construct_single_link_response_for_failure(
                             single_link_request, e
