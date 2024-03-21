@@ -2,7 +2,7 @@
 
 # ruff: noqa: I001
 
-from openg2p_spar_mapper_api.app import Initializer
+from src.app import Initializer
 
 main_init = Initializer()
 
