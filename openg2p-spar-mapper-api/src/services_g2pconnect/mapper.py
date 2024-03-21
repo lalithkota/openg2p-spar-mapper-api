@@ -4,57 +4,101 @@ from datetime import datetime
 from openg2p_fastapi_common.context import dbengine
 from openg2p_fastapi_common.service import BaseService
 from sqlalchemy.ext.asyncio import async_sessionmaker
+from openg2p_g2pconnect_common_lib.common.schemas import (
+    SyncRequest,
+    StatusEnum,
+)
+
+from openg2p_g2pconnect_common_lib.spar.schemas import (
+    SingleLinkResponse,
+    LinkRequest,
+)
 
 from ..config import Settings
 from ..models.orm.id_fa_mapping import IdFaMapping
-from ..schemas import IdFaMappingError
-from ..utils.exceptions import IdFaMappingValidationException
-from ..utils.id_fa_mapping_validations import IdFaMappingValidations
+from ..services.exceptions import IdFaMappingValidationException
+from ..services.id_fa_mapping_validations import IdFaMappingValidations
+
 
 _config = Settings.get_config()
 _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class MapperService(BaseService):
-    async def link(self, id_fa_mappings: list[IdFaMapping]) -> list[IdFaMappingError]:
-        id_fa_mapping_errors: list[IdFaMappingError] = []
+    async def link(self, request: SyncRequest) -> list[SingleLinkResponse]:
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
-        async with session_maker() as session:
-            for id_fa_mapping in id_fa_mappings:
-                try:
-                    IdFaMappingValidations(
-                        connection=session, id_fa_mapping=id_fa_mapping
-                    ).validate_id_fa_mapping()
 
-                    # TODO: Do bulk insert
-                    session.add(
-                        IdFaMapping(
-                            id_value=id_fa_mapping.id_value,
-                            fa_value=id_fa_mapping.fa_value,
-                            name=id_fa_mapping.name,
-                            phone=id_fa_mapping.phone_number,
-                            additional_info=(
-                                [
-                                    info.model_dump()
-                                    for info in id_fa_mapping.additional_info
-                                ]
-                                if id_fa_mapping.additional_info
-                                else None
-                            ),
-                            active=True,
-                            created_at=datetime.now(),
+        async with session_maker() as session:
+            linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
+            mappings_to_add = []
+            single_link_responses: list[SingleLinkResponse] = []
+
+            for single_link_request in linkRequest.link_request:
+
+                try:
+                    IdFaMappingValidations.get_component().validate_link_request(
+                        connection=session, single_link_request=single_link_request
+                    )
+
+                    mappings_to_add.append(
+                        self.construct_id_fa_mapping(single_link_request)
+                    )
+                    single_link_responses.append(
+                        self.construct_single_link_response_for_success(
+                            single_link_request
                         )
                     )
-                    await session.commit()
+
                 except IdFaMappingValidationException as e:
-                    id_fa_mapping_errors.append(
-                        IdFaMappingError(
-                            id=id_fa_mapping.id_value,
-                            fa=id_fa_mapping.fa_value,
-                            error_type=e.validation_error_type,
+                    single_link_responses.append(
+                        self.construct_single_link_response_for_failure(
+                            single_link_request, e
                         )
                     )
-        return id_fa_mapping_errors
+
+            session.add_all(mappings_to_add)
+            await session.commit()
+
+        return single_link_responses
+
+    @staticmethod
+    def construct_id_fa_mapping(single_link_request):
+        return IdFaMapping(
+            id_value=single_link_request.id,
+            fa_value=single_link_request.fa,
+            name=single_link_request.name,
+            phone=single_link_request.phone_number,
+            additional_info=single_link_request.additional_info,
+            active=True,
+        )
+
+    @staticmethod
+    def construct_single_link_response_for_success(single_link_request):
+
+        return SingleLinkResponse(
+            reference_id=single_link_request.reference_id,
+            timestamp=datetime.now(),
+            fa=single_link_request.fa,
+            status=StatusEnum.succ,
+            status_reason_code=None,
+            status_reason_message=None,
+            additional_info=None,
+            locale=single_link_request.locale,
+        )
+
+    @staticmethod
+    def construct_single_link_response_for_failure(single_link_request, error):
+
+        return SingleLinkResponse(
+            reference_id=single_link_request.reference_id,
+            timestamp=datetime.now(),
+            fa=single_link_request.fa,
+            status=StatusEnum.rjct,
+            status_reason_code=error.validation_error_type,
+            status_reason_message=error.message,
+            additional_info=None,
+            locale=single_link_request.locale,
+        )
 
     # async def update(
     #     self, correlation_id: str, request: UpdateHttpRequest, make_callback=True
