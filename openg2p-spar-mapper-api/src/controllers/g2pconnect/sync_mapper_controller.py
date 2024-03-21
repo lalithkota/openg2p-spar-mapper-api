@@ -1,10 +1,16 @@
 import uuid
 
-from openg2p_g2pconnect_common_lib.schemas import SyncRequest, SyncResponse
 from openg2p_fastapi_common.controller import BaseController
 from openg2p_fastapi_common.errors import BaseAppException
+from openg2p_g2pconnect_common_lib.common.schemas import (
+    SyncRequest,
+    SyncResponse,
+)
+from openg2p_g2pconnect_common_lib.spar.schemas.link import (
+    SingleLinkResponse,
+)
 
-from ..services.mapper_service import MapperService
+from ...services_g2pconnect import RequestValidation, SyncResponseHelper, MapperService, RequestValidationException
 
 
 class SyncMapperController(BaseController):
@@ -13,8 +19,8 @@ class SyncMapperController(BaseController):
 
         self.mapper_service = MapperService.get_component()
 
-        self.router.prefix += "/mapper/sync"
-        self.router.tags += ["mapper-sync"]
+        self.router.prefix += "/g2pconnect/mapper/sync"
+        self.router.tags += ["G2PConnect Mapper Sync"]
 
         self.router.add_api_route(
             "/link",
@@ -43,19 +49,21 @@ class SyncMapperController(BaseController):
         )
 
     async def link_sync(self, request: SyncRequest):
-        if request.header.action != "link":
-            raise BaseAppException(
-                code="MPR-REQ-400",
-                message="Received Invalid action in header for 'link'.",
-                http_status_code=400,
+        try:
+            RequestValidation.validate_request(request)
+            RequestValidation.validate_link_request_header(request)
+        except RequestValidationException as e:
+            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
+                request, e
             )
+            return error_response
 
-        # TODO: For now returning random correlation id.
-        correlation_id = str(uuid.uuid4())
-        # TODO: For now creating async task and forgetting
-
-        return await self.mapper_service.link(
-            correlation_id, request, make_callback=False
+        single_link_responses: list[SingleLinkResponse] = (
+            await self.mapper_service.link(request)
+        )
+        return SyncResponseHelper.get_component().construct_success_sync_response(
+            request,
+            single_link_responses,
         )
 
     async def update_sync(self, request: SyncRequest):
