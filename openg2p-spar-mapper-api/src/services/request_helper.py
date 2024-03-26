@@ -2,7 +2,7 @@ from datetime import datetime
 
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import (
-    SyncRequest,
+    Request,
 )
 from openg2p_g2pconnect_common_lib.spar.schemas.link import (
     LinkRequest,
@@ -13,7 +13,8 @@ from ..models.orm.id_fa_mapping import IdFaMapping
 
 class SyncRequestHelper(BaseService):
 
-    def deconstruct_link_request(self, request: SyncRequest) -> list[IdFaMapping]:
+    @staticmethod
+    def deconstruct_link_request(self, request: Request) -> list[IdFaMapping]:
         linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
         return [
             IdFaMapping(
