@@ -63,7 +63,7 @@ class SyncMapperController(BaseController):
         single_link_responses: list[SingleLinkResponse] = (
             await self.mapper_service.link(request)
         )
-        return SyncResponseHelper.construct_success_sync_link_response(
+        return SyncResponseHelper.get_component().construct_success_sync_link_response(
             request,
             single_link_responses,
         )
