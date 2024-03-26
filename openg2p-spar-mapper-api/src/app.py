@@ -8,7 +8,7 @@ _config = Settings.get_config()
 from openg2p_fastapi_common.app import Initializer as BaseInitializer
 from .controllers.g2pconnect.sync_mapper_controller import SyncMapperController
 from .models.orm.id_fa_mapping import IdFaMapping
-from .services_g2pconnect import (
+from .services import (
     MapperService,
     SyncRequestHelper,
     RequestValidation,
