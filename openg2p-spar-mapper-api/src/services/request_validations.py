@@ -15,6 +15,7 @@ class RequestValidation(BaseService):
                 message=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported,
             )
         return None
+
     @staticmethod
     def validate_update_request_header(request) -> None:
         if request.header.action != "update":
@@ -23,6 +24,7 @@ class RequestValidation(BaseService):
                 message=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported,
             )
         return None
+
     @staticmethod
     def validate_resolve_request_header(request) -> None:
         if request.header.action != "resolve":
@@ -31,6 +33,7 @@ class RequestValidation(BaseService):
                 message=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported,
             )
         return None
+
     @staticmethod
     def validate_request(request) -> None:
         # TODO: Validate the request

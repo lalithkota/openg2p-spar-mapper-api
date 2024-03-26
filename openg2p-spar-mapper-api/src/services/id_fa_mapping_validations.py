@@ -1,19 +1,30 @@
-from openg2p_g2pconnect_common_lib.spar.schemas.resolve import SingleResolveRequest, ResolveStatusReasonCode
+from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
+    SingleResolveRequest,
+    ResolveStatusReasonCode,
+)
 
 from openg2p_fastapi_common.service import BaseService
-from openg2p_g2pconnect_common_lib.spar.schemas import LinkStatusReasonCode, SingleUpdateRequest, UpdateStatusReasonCode
+from openg2p_g2pconnect_common_lib.spar.schemas import (
+    LinkStatusReasonCode,
+    SingleUpdateRequest,
+    UpdateStatusReasonCode,
+)
 from openg2p_g2pconnect_common_lib.spar.schemas import SingleLinkRequest
 from sqlalchemy import and_, select
 
-from .exceptions import LinkValidationException, UpdateValidationException, ResolveValidationException
-from ..models.orm import IdFaMapping
+from .exceptions import (
+    LinkValidationException,
+    UpdateValidationException,
+    ResolveValidationException,
+)
+from ..models import IdFaMapping
 
 
 class IdFaMappingValidations(BaseService):
 
     @staticmethod
     async def validate_link_request(
-         connection, single_link_request: SingleLinkRequest
+        connection, single_link_request: SingleLinkRequest
     ) -> None:
 
         # Check if the ID is null
@@ -51,7 +62,7 @@ class IdFaMappingValidations(BaseService):
 
     @staticmethod
     async def validate_update_request(
-       connection, single_update_request: SingleUpdateRequest
+        connection, single_update_request: SingleUpdateRequest
     ) -> None:
 
         # Check if the ID is null
@@ -89,7 +100,7 @@ class IdFaMappingValidations(BaseService):
 
     @staticmethod
     async def validate_resolve_request(
-       connection, single_resolve_request: SingleResolveRequest
+        connection, single_resolve_request: SingleResolveRequest
     ) -> None:
 
         # Check if the ID is null

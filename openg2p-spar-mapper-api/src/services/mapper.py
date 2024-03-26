@@ -1,27 +1,33 @@
 import logging
 from datetime import datetime
 
-from openg2p_g2pconnect_common_lib.spar.schemas.resolve import ResolveStatusReasonCode, ResolveScope
+from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
+    ResolveStatusReasonCode,
+    ResolveScope,
+)
 
 from openg2p_fastapi_common.context import dbengine
 from openg2p_fastapi_common.service import BaseService
-from openg2p_g2pconnect_common_lib.common.schemas import (
-    Request,
-    StatusEnum
-)
+from openg2p_g2pconnect_common_lib.common.schemas import Request, StatusEnum
 from openg2p_g2pconnect_common_lib.spar.schemas import (
     SingleLinkResponse,
     SingleUpdateResponse,
     SingleResolveResponse,
     LinkRequest,
     UpdateRequest,
-    ResolveRequest, LinkStatusReasonCode, UpdateStatusReasonCode
+    ResolveRequest,
+    LinkStatusReasonCode,
+    UpdateStatusReasonCode,
 )
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy import and_, select
 from ..config import Settings
-from ..models.orm.id_fa_mapping import IdFaMapping
-from ..services.exceptions import LinkValidationException, UpdateValidationException, ResolveValidationException
+from ..models import IdFaMapping
+from ..services.exceptions import (
+    LinkValidationException,
+    UpdateValidationException,
+    ResolveValidationException,
+)
 from ..services.id_fa_mapping_validations import IdFaMappingValidations
 
 _config = Settings.get_config()
@@ -55,12 +61,11 @@ class MapperService(BaseService):
                     custom_exception = LinkValidationException(
                         message="Duplicate ID exists. Use 'update' instead.",
                         status=StatusEnum.rjct,
-                        validation_error_type=LinkStatusReasonCode.rjct_id_invalid
+                        validation_error_type=LinkStatusReasonCode.rjct_id_invalid,
                     )
                     single_link_responses.append(
                         self.construct_single_link_response_for_failure(
-                            single_link_request,
-                            e
+                            single_link_request, e
                         )
                     )
         session.add_all(mappings_to_add)
@@ -127,12 +132,11 @@ class MapperService(BaseService):
                     custom_exception = UpdateValidationException(
                         message="Mapping doesnt exist against given ID. Use 'link' instead.",
                         status=StatusEnum.rjct,
-                        validation_error_type=UpdateStatusReasonCode.rjct_id_invalid
+                        validation_error_type=UpdateStatusReasonCode.rjct_id_invalid,
                     )
                     single_update_responses.append(
                         self.construct_single_update_response_for_failure(
-                            single_update_request,
-                            e
+                            single_update_request, e
                         )
                     )
 
@@ -169,8 +173,12 @@ class MapperService(BaseService):
 
     @staticmethod
     async def update_mapping(session, single_update_request):
-        single_response = single_update_request.construct_single_update_response_for_success()
-        result = await session.execute(select(IdFaMapping).where(IdFaMapping.id_value == single_update_request.id))
+        single_response = (
+            single_update_request.construct_single_update_response_for_success()
+        )
+        result = await session.execute(
+            select(IdFaMapping).where(IdFaMapping.id_value == single_update_request.id)
+        )
         result = result.scalar()
 
         if result:
@@ -181,19 +189,21 @@ class MapperService(BaseService):
             if single_update_request.phone_number:
                 result.phone = single_update_request.phone_number
             if single_update_request.additional_info:
-                addl_info_copy = result.additional_info.copy() if result.additional_info else []
+                addl_info_copy = (
+                    result.additional_info.copy() if result.additional_info else []
+                )
                 addl_info_keys = [info["name"] for info in addl_info_copy]
                 for info in single_update_request.additional_info:
                     if info.name in addl_info_keys:
-                        addl_info_copy[addl_info_keys.index(info.name)] = info.model_dump()
+                        addl_info_copy[addl_info_keys.index(info.name)] = (
+                            info.model_dump()
+                        )
                     else:
                         addl_info_copy.append(info.model_dump())
                 result.additional_info = addl_info_copy
         else:
             single_response.status = StatusEnum.rjct
-            single_response.status_reason_code = (
-                UpdateStatusReasonCode.rjct_id_invalid
-            )
+            single_response.status_reason_code = UpdateStatusReasonCode.rjct_id_invalid
             single_response.status_reason_message = (
                 "Mapping doesnt exist against given ID. Use 'link' instead."
             )
@@ -203,7 +213,9 @@ class MapperService(BaseService):
     async def resolve(self, request: Request):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
-            resolveRequest: ResolveRequest = ResolveRequest.model_validate(request.message)
+            resolveRequest: ResolveRequest = ResolveRequest.model_validate(
+                request.message
+            )
             mappings_to_add = []
             single_resolve_responses: list[SingleResolveResponse] = []
 
@@ -211,15 +223,20 @@ class MapperService(BaseService):
 
                 try:
                     await IdFaMappingValidations.get_component().validate_resolve_request(
-                        connection=session, single_resolve_request=single_resolve_request
+                        connection=session,
+                        single_resolve_request=single_resolve_request,
                     )
 
-                    stmt, is_rejected = await self.construct_query(single_resolve_request)
+                    stmt, is_rejected = await self.construct_query(
+                        single_resolve_request
+                    )
                     if is_rejected:
                         return single_resolve_responses, True
 
                     result = await self.execute_query(session, stmt)
-                    self.construct_single_resolve_response(single_resolve_request, result)
+                    self.construct_single_resolve_response(
+                        single_resolve_request, result
+                    )
 
                     single_resolve_responses.append(
                         self.construct_single_resolve_response_for_success(
@@ -239,16 +256,22 @@ class MapperService(BaseService):
 
     @staticmethod
     def construct_single_resolve(single_resolve_request, result):
-        single_response = single_resolve_request.construct_single_resolve_response_for_success()
+        single_response = (
+            single_resolve_request.construct_single_resolve_response_for_success()
+        )
 
         if result:
             if single_resolve_request.scope == ResolveScope.details:
                 single_response.fa = result.fa_value
                 single_response.id = result.id_value
-                single_response.additional_info = [
-                    # AdditionalInfo.model_validate(info)
-                    # for info in result.additional_info
-                ] if result.additional_info else None
+                single_response.additional_info = (
+                    [
+                        # AdditionalInfo.model_validate(info)
+                        # for info in result.additional_info
+                    ]
+                    if result.additional_info
+                    else None
+                )
             elif single_resolve_request.scope == ResolveScope.yes_no:
                 pass
             if single_resolve_request.fa and not single_resolve_request.id:
@@ -305,7 +328,7 @@ class MapperService(BaseService):
             raise ResolveValidationException(
                 message="Neither ID (nor FA) is given.",
                 status=StatusEnum.rjct,
-                validation_error_type=ResolveStatusReasonCode.rjct_id_invalid
+                validation_error_type=ResolveStatusReasonCode.rjct_id_invalid,
             )  # Indicates query construction failure
         return stmt, False
 
@@ -313,6 +336,7 @@ class MapperService(BaseService):
     async def execute_query(session, stmt):
         result = await session.execute(stmt)
         return result.scalar() if result else None
+
     @staticmethod
     def construct_single_resolve_response_for_success(single_resolve_request):
         return SingleResolveResponse(

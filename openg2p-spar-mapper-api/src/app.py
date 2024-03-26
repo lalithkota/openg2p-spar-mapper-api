@@ -6,14 +6,20 @@ from .config import Settings
 _config = Settings.get_config()
 
 from openg2p_fastapi_common.app import Initializer as BaseInitializer
-from .controllers.g2pconnect.sync_mapper_controller import SyncMapperController
-from .models.orm.id_fa_mapping import IdFaMapping
+from .controllers.g2pconnect import (
+    SyncMapperController,
+    AsyncMapperController,
+)
+
+from .models import IdFaMapping
 from .services import (
     MapperService,
     SyncRequestHelper,
     RequestValidation,
     SyncResponseHelper,
     IdFaMappingValidations,
+    AsyncRequestHelper,
+    AsyncResponseHelper,
 )
 
 
@@ -24,9 +30,12 @@ class Initializer(BaseInitializer):
         MapperService()
         IdFaMappingValidations()
         SyncRequestHelper()
+        AsyncRequestHelper()
         RequestValidation()
         SyncResponseHelper()
+        AsyncResponseHelper()
         SyncMapperController().post_init()
+        AsyncMapperController().post_init()
 
     def migrate_database(self, args):
         super().migrate_database(args)
