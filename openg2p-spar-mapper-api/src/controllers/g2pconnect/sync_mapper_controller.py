@@ -1,16 +1,18 @@
-import uuid
-
 from openg2p_fastapi_common.controller import BaseController
-from openg2p_fastapi_common.errors import BaseAppException
 from openg2p_g2pconnect_common_lib.common.schemas import (
-    SyncRequest,
+    Request,
     SyncResponse,
 )
 from openg2p_g2pconnect_common_lib.spar.schemas.link import (
     SingleLinkResponse,
 )
-
-from ...services_g2pconnect import RequestValidation, SyncResponseHelper, MapperService, RequestValidationException
+from openg2p_g2pconnect_common_lib.spar.schemas.update import (
+    SingleUpdateResponse,
+)
+from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
+    SingleResolveResponse,
+)
+from ...services import RequestValidation, SyncResponseHelper, MapperService, RequestValidationException
 
 
 class SyncMapperController(BaseController):
@@ -48,7 +50,7 @@ class SyncMapperController(BaseController):
             methods=["POST"],
         )
 
-    async def link_sync(self, request: SyncRequest):
+    async def link_sync(self, request: Request):
         try:
             RequestValidation.validate_request(request)
             RequestValidation.validate_link_request_header(request)
@@ -61,37 +63,46 @@ class SyncMapperController(BaseController):
         single_link_responses: list[SingleLinkResponse] = (
             await self.mapper_service.link(request)
         )
-        return SyncResponseHelper.get_component().construct_success_sync_response(
+        return SyncResponseHelper.get_component().construct_success_sync_link_response(
             request,
             single_link_responses,
         )
 
-    async def update_sync(self, request: SyncRequest):
-        if request.header.action != "update":
-            raise BaseAppException(
-                code="MPR-REQ-400",
-                message="Received Invalid action in header for 'update'.",
-                http_status_code=400,
+    async def update_sync(self, request: Request):
+
+        try:
+            RequestValidation.validate_request(request)
+            RequestValidation.validate_update_request_header(request)
+        except RequestValidationException as e:
+            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
+                request, e
             )
-        # TODO: For now returning random correlation id.
-        correlation_id = str(uuid.uuid4())
-        # TODO: For now creating async task and forgetting
-        return await self.mapper_service.update(
-            correlation_id, request, make_callback=False
+            return error_response
+
+        single_update_responses: list[SingleUpdateResponse] = (
+            await self.mapper_service.link(request)
+        )
+        return SyncResponseHelper.get_component().construct_success_sync_update_response(
+            request,
+            single_update_responses,
         )
 
-    async def resolve_sync(self, request: SyncRequest):
-        if request.header.action != "resolve":
-            raise BaseAppException(
-                code="MPR-REQ-400",
-                message="Received Invalid action in header for 'resolve'.",
-                http_status_code=400,
+    async def resolve_sync(self, request: Request):
+        try:
+            RequestValidation.validate_request(request)
+            RequestValidation.validate_resolve_request_header(request)
+        except RequestValidationException as e:
+            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
+                request, e
             )
-        # TODO: For now returning random correlation id.
-        correlation_id = str(uuid.uuid4())
-        # TODO: For now creating async task and forgetting
-        return await self.mapper_service.resolve(
-            correlation_id, request, make_callback=False
+            return error_response
+
+        single_resolve_responses: list[SingleResolveResponse] = (
+            await self.mapper_service.link(request)
+        )
+        return SyncResponseHelper.get_component().construct_success_sync_resolve_response(
+            request,
+            single_resolve_responses,
         )
 
     async def unlink_sync(self):
