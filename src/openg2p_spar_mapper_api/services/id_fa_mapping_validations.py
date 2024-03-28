@@ -8,14 +8,19 @@ from openg2p_g2pconnect_common_lib.spar.schemas import (
     LinkStatusReasonCode,
     SingleUpdateRequest,
     UpdateStatusReasonCode,
+    UnlinkStatusReasonCode,
+    SingleResolveRequest,
+    SingleUnlinkRequest,
+    SingleLinkRequest,
+    ResolveStatusReasonCode,
 )
-from openg2p_g2pconnect_common_lib.spar.schemas import SingleLinkRequest
 from sqlalchemy import and_, select
 
 from .exceptions import (
     LinkValidationException,
     UpdateValidationException,
     ResolveValidationException,
+    UnlinkValidationException
 )
 from ..models import IdFaMapping
 
@@ -133,4 +138,38 @@ class IdFaMappingValidations(BaseService):
                 message="ID doesnt exist please link first",
                 validation_error_type=ResolveStatusReasonCode.rjct_reference_id_duplicate,
             )
+        return None
+    
+    @staticmethod
+    async def validate_unlink_request(
+        connection, single_unlink_request: SingleUnlinkRequest
+    ) -> None:
+        
+        if not single_unlink_request.id:
+            raise UnlinkValidationException(
+                message="ID is null",
+                validation_error_type=UnlinkValidationException.rjct_id_invalid,
+            )
+        
+        if not single_unlink_request.fa:
+            raise UnlinkValidationException(
+                message="FA is null",
+                validation_error_type=UnlinkValidationException.rjct_fa_invalid,
+            )
+        result = await connection.execute(
+            select(IdFaMapping).where(
+                and_(
+                    IdFaMapping.id_value == single_unlink_request.id,
+                    IdFaMapping.fa_value == single_unlink_request.fa,
+                )
+            )
+        )
+        link_request_from_db = result.first()
+
+        if link_request_from_db is None:
+            raise UnlinkValidationException(
+                message="ID doesnt exist please link first",
+                validation_error_type=UnlinkStatusReasonCode.rjct_reference_id_duplicate,
+            )
+
         return None

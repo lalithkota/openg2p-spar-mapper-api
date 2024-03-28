@@ -18,6 +18,9 @@ from openg2p_g2pconnect_common_lib.spar.schemas import (
     ResolveRequest,
     LinkStatusReasonCode,
     UpdateStatusReasonCode,
+    UnlinkRequest,
+    SingleUnlinkResponse,
+    UnlinkStatusReasonCode
 )
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy import and_, select
@@ -25,6 +28,7 @@ from ..config import Settings
 from ..models import IdFaMapping
 from ..services.exceptions import (
     LinkValidationException,
+    UnlinkValidationException,
     UpdateValidationException,
     ResolveValidationException,
 )
@@ -362,4 +366,76 @@ class MapperService(BaseService):
             status_reason_message=error.message,
             additional_info=None,
             locale=single_resolve_request.locale,
+        )
+
+    async def unlink(self, request: Request):
+        session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
+        async with session_maker() as session:
+            unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
+            single_unlink_responses: list[SingleUnlinkResponse] = []
+            mappings_to_delete = []
+            for single_unlink_request in unlinkRequest.link_request:
+
+                try:
+                    await IdFaMappingValidations.get_component().validate_unlink_request(
+                        connection=session, single_update_request=single_unlink_request
+                    )
+                    mappings_to_delete.append(
+                        self.unlink_id_fa_mapping(single_unlink_request)
+                    )
+                    single_unlink_responses.append(
+                        self.construct_single_unlink_response_for_success(
+                            single_unlink_request
+                        )
+                    )
+                except UnlinkValidationException as e:
+                    custom_exception = UnlinkValidationException(
+                        message=" ID doesn't exist",
+                        status=StatusEnum.rjct,
+                        validation_error_type=UnlinkStatusReasonCode.rjct_id_invalid,
+                    )
+                    single_unlink_responses.append(
+                        self.construct_single_unlink_response_for_failure(
+                            single_unlink_request, e
+                        )
+                    )
+        session.delete(*mappings_to_delete)
+        await session.commit()
+        return single_unlink_responses
+
+    @staticmethod
+    def unlink_id_fa_mapping(single_unlink_request):
+        return IdFaMapping(
+            id_value=single_unlink_request.id,
+            fa_value=single_unlink_request.fa,
+            name=single_unlink_request.name,
+            phone=single_unlink_request.phone_number,
+            additional_info=single_unlink_request.additional_info,
+            active=True,
+        )
+    @staticmethod
+    def construct_single_unlink_response_for_success(single_unlink_request):
+        return SingleUnlinkResponse(
+            reference_id=single_unlink_request.reference_id,
+            timestamp=datetime.now(),
+            fa=single_unlink_request.fa,
+            status=StatusEnum.succ,
+            status_reason_code=None,
+            status_reason_message=None,
+            additional_info=None,
+            locale=single_unlink_request.locale,
+        )
+
+    @staticmethod
+    def construct_single_unlink_response_for_failure(single_unlink_request, error):
+
+        return SingleUnlinkResponse(
+            reference_id=single_unlink_request.reference_id,
+            timestamp=datetime.now(),
+            fa=single_unlink_request.fa,
+            status=StatusEnum.rjct,
+            status_reason_code=error.validation_error_type,
+            status_reason_message=error.message,
+            additional_info=None,
+            locale=single_unlink_request.locale,
         )
