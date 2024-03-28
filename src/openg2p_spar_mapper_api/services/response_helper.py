@@ -12,7 +12,7 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
     AsyncCallbackRequestHeader,
     AsyncAck,
 )
-from openg2p_g2pconnect_common_lib.spar.schemas import (
+from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkResponse,
     LinkRequest,
     SingleLinkResponse,
@@ -36,7 +36,7 @@ from .exceptions import (
     LinkValidationException,
     UpdateValidationException,
     ResolveValidationException,
-    UnlinkValidationException
+    UnlinkValidationException,
 )
 
 
@@ -180,7 +180,7 @@ class SyncResponseHelper(BaseService):
         request: Request,
         single_unlink_responses: list[SingleUnlinkResponse],
     ) -> SyncResponse:
-        unlinkRequest:  UnlinkRequest = UnlinkRequest.model_validate(request.message)
+        unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
         unlinkResponse: UnlinkResponse = UnlinkResponse(
             transaction_id=unlinkRequest.transaction_id,
             correlation_id=None,

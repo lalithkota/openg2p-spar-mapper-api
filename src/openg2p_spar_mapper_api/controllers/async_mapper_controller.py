@@ -9,11 +9,11 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
     AsyncResponse,
     AsyncCallbackRequest,
 )
-from openg2p_g2pconnect_common_lib.spar.schemas.link import (
+from openg2p_g2pconnect_common_lib.mapper.schemas.link import (
     SingleLinkResponse,
 )
-from ...config import Settings
-from ...services import (
+from src.openg2p_spar_mapper_api.config import Settings
+from src.openg2p_spar_mapper_api.services import (
     RequestValidation,
     AsyncResponseHelper,
     MapperService,

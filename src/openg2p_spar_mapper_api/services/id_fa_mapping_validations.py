@@ -1,10 +1,10 @@
-from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
+from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
     SingleResolveRequest,
     ResolveStatusReasonCode,
 )
 
 from openg2p_fastapi_common.service import BaseService
-from openg2p_g2pconnect_common_lib.spar.schemas import (
+from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkStatusReasonCode,
     SingleUpdateRequest,
     UpdateStatusReasonCode,
@@ -20,7 +20,7 @@ from .exceptions import (
     LinkValidationException,
     UpdateValidationException,
     ResolveValidationException,
-    UnlinkValidationException
+    UnlinkValidationException,
 )
 from ..models import IdFaMapping
 
@@ -139,18 +139,18 @@ class IdFaMappingValidations(BaseService):
                 validation_error_type=ResolveStatusReasonCode.rjct_reference_id_duplicate,
             )
         return None
-    
+
     @staticmethod
     async def validate_unlink_request(
         connection, single_unlink_request: SingleUnlinkRequest
     ) -> None:
-        
+
         if not single_unlink_request.id:
             raise UnlinkValidationException(
                 message="ID is null",
                 validation_error_type=UnlinkValidationException.rjct_id_invalid,
             )
-        
+
         if not single_unlink_request.fa:
             raise UnlinkValidationException(
                 message="FA is null",

@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
+from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
     ResolveStatusReasonCode,
     ResolveScope,
 )
@@ -9,7 +9,7 @@ from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
 from openg2p_fastapi_common.context import dbengine
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import Request, StatusEnum
-from openg2p_g2pconnect_common_lib.spar.schemas import (
+from openg2p_g2pconnect_common_lib.mapper.schemas import (
     SingleLinkResponse,
     SingleUpdateResponse,
     SingleResolveResponse,
@@ -20,7 +20,7 @@ from openg2p_g2pconnect_common_lib.spar.schemas import (
     UpdateStatusReasonCode,
     UnlinkRequest,
     SingleUnlinkResponse,
-    UnlinkStatusReasonCode
+    UnlinkStatusReasonCode,
 )
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy import and_, select
@@ -413,6 +413,7 @@ class MapperService(BaseService):
             additional_info=single_unlink_request.additional_info,
             active=True,
         )
+
     @staticmethod
     def construct_single_unlink_response_for_success(single_unlink_request):
         return SingleUnlinkResponse(
