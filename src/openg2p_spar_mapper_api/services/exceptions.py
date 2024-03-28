@@ -1,6 +1,10 @@
 from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
-from openg2p_g2pconnect_common_lib.spar.schemas import LinkStatusReasonCode,ResolveStatusReasonCode,UpdateStatusReasonCode,UnlinkStatusReasonCode
-
+from openg2p_g2pconnect_common_lib.mapper.schemas import (
+    LinkStatusReasonCode,
+    ResolveStatusReasonCode,
+    UpdateStatusReasonCode,
+    UnlinkStatusReasonCode,
+)
 
 
 class LinkValidationException(Exception):
@@ -33,6 +37,7 @@ class UnlinkValidationException(Exception):
         super().__init__(self.message)
         self.status: StatusEnum = status
         self.validation_error_type: UnlinkStatusReasonCode = validation_error_type
+
 
 class RequestValidationException(Exception):
     # TODO : Add code

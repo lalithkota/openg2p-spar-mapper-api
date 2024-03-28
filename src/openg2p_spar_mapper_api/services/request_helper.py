@@ -4,7 +4,7 @@ from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import (
     Request,
 )
-from openg2p_g2pconnect_common_lib.spar.schemas.link import (
+from openg2p_g2pconnect_common_lib.mapper.schemas.link import (
     LinkRequest,
 )
 

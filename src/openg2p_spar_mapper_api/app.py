@@ -3,7 +3,7 @@ import asyncio
 
 from .config import Settings
 from openg2p_fastapi_common.app import Initializer as BaseInitializer
-from .controllers.g2pconnect import (
+from .controllers import (
     SyncMapperController,
     AsyncMapperController,
 )
@@ -17,6 +17,7 @@ from .services import (
     AsyncRequestHelper,
     AsyncResponseHelper,
 )
+
 _config = Settings.get_config()
 
 
