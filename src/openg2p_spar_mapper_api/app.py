@@ -2,15 +2,11 @@
 import asyncio
 
 from .config import Settings
-
-_config = Settings.get_config()
-
 from openg2p_fastapi_common.app import Initializer as BaseInitializer
 from .controllers.g2pconnect import (
     SyncMapperController,
     AsyncMapperController,
 )
-
 from .models import IdFaMapping
 from .services import (
     MapperService,
@@ -21,6 +17,7 @@ from .services import (
     AsyncRequestHelper,
     AsyncResponseHelper,
 )
+_config = Settings.get_config()
 
 
 class Initializer(BaseInitializer):

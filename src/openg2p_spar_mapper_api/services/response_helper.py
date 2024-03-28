@@ -25,6 +25,10 @@ from openg2p_g2pconnect_common_lib.spar.schemas import (
     SingleResolveResponse,
     ResolveResponse,
     ResolveStatusReasonCode,
+    UnlinkRequest,
+    UnlinkResponse,
+    SingleUnlinkResponse,
+    UnlinkStatusReasonCode,
 )
 
 from .exceptions import (
@@ -32,6 +36,7 @@ from .exceptions import (
     LinkValidationException,
     UpdateValidationException,
     ResolveValidationException,
+    UnlinkValidationException
 )
 
 
@@ -84,7 +89,6 @@ class SyncResponseHelper(BaseService):
 
     @staticmethod
     def construct_success_sync_update_response(
-        self,
         request: Request,
         single_update_responses: list[SingleUpdateResponse],
     ) -> SyncResponse:
@@ -129,7 +133,6 @@ class SyncResponseHelper(BaseService):
 
     @staticmethod
     def construct_success_sync_resolve_response(
-        self,
         request: Request,
         single_resolve_responses: list[SingleResolveResponse],
     ) -> SyncResponse:
@@ -173,8 +176,52 @@ class SyncResponseHelper(BaseService):
         )
 
     @staticmethod
+    def construct_success_sync_unlink_response(
+        request: Request,
+        single_unlink_responses: list[SingleUnlinkResponse],
+    ) -> SyncResponse:
+        unlinkRequest:  UnlinkRequest = UnlinkRequest.model_validate(request.message)
+        unlinkResponse: UnlinkResponse = UnlinkResponse(
+            transaction_id=unlinkRequest.transaction_id,
+            correlation_id=None,
+            link_response=single_unlink_responses,
+        )
+        total_count = len(unlinkResponse.link_response)
+        completed_count = len(
+            [
+                link
+                for link in unlinkResponse.link_response
+                if link.status == StatusEnum.succ
+            ]
+        )
+        if completed_count == 0:
+            raise UnlinkValidationException(
+                message="All requests in transaction failed.",
+                status=StatusEnum.rjct,
+                validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
+            )
+        return SyncResponse(
+            header=SyncResponseHeader(
+                version="1.0.0",
+                message_id=request.header.message_id,
+                message_ts=datetime.now().isoformat(),
+                action=request.header.action,
+                status=StatusEnum.succ,
+                status_reason_code=None,
+                status_reason_message=None,
+                total_count=total_count,
+                completed_count=completed_count,
+                sender_id=request.header.sender_id,
+                receiver_id=request.header.receiver_id,
+                is_msg_encrypted=False,
+                meta={},
+            ),
+            message=unlinkResponse,
+        )
+
+    @staticmethod
     def construct_error_sync_response(
-        self, request: Request, exception: RequestValidationException
+        request: Request, exception: RequestValidationException
     ) -> SyncResponse:
         return SyncResponse(
             signature=None,

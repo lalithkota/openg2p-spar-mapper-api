@@ -80,7 +80,7 @@ class SyncMapperController(BaseController):
             return error_response
 
         single_update_responses: list[SingleUpdateResponse] = (
-            await self.mapper_service.link(request)
+            await self.mapper_service.update(request)
         )
         return SyncResponseHelper.get_component().construct_success_sync_update_response(
             request,
@@ -98,12 +98,27 @@ class SyncMapperController(BaseController):
             return error_response
 
         single_resolve_responses: list[SingleResolveResponse] = (
-            await self.mapper_service.link(request)
+            await self.mapper_service.resolve(request)
         )
         return SyncResponseHelper.get_component().construct_success_sync_resolve_response(
             request,
             single_resolve_responses,
         )
 
-    async def unlink_sync(self):
-        raise NotImplementedError()
+    async def unlink_sync(self, request: Request):
+        try:
+            RequestValidation.validate_request(request)
+            RequestValidation.validate_unlink_request_header(request)
+        except RequestValidationException as e:
+            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
+                request, e
+            )
+            return error_response
+
+        single_unlink_responses: list[SingleResolveResponse] = (
+            await self.mapper_service.unlink(request)
+        )
+        return SyncResponseHelper.get_component().construct_success_sync_unlink_response(
+            request,
+            single_unlink_responses,
+        )
