@@ -9,7 +9,7 @@ from . import __version__
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="spar_g2pconnect_mapper_", env_file=".env", extra="allow"
+        env_prefix="spar_mapper_", env_file=".env", extra="allow"
     )
 
     openapi_title: str = "OpenG2P SPAR Account Mapper"
