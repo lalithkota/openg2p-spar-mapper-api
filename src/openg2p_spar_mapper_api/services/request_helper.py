@@ -12,7 +12,6 @@ from ..models import IdFaMapping
 
 
 class SyncRequestHelper(BaseService):
-
     @staticmethod
     def deconstruct_link_request(self, request: Request) -> list[IdFaMapping]:
         linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
@@ -31,7 +30,6 @@ class SyncRequestHelper(BaseService):
 
 
 class AsyncRequestHelper(BaseService):
-
     def deconstruct_link_request(self, request: Request) -> list[IdFaMapping]:
         linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
         return [

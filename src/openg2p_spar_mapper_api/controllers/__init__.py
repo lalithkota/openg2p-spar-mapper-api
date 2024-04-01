@@ -1,2 +1,2 @@
-from .sync_mapper_controller import SyncMapperController
 from .async_mapper_controller import AsyncMapperController
+from .sync_mapper_controller import SyncMapperController
