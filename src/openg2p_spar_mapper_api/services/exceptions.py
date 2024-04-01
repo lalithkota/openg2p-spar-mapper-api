@@ -34,6 +34,7 @@ class UnlinkValidationException(Exception):
         self.status: StatusEnum = status
         self.validation_error_type: UnlinkStatusReasonCode = validation_error_type
 
+
 class RequestValidationException(Exception):
     # TODO : Add code
     def __init__(self, code, message):

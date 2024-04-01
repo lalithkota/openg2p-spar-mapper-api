@@ -21,7 +21,7 @@ class SyncMapperController(BaseController):
 
         self.mapper_service = MapperService.get_component()
 
-        self.router.prefix += "/g2pconnect/mapper/sync"
+        self.router.prefix += "/mapper/sync"
         self.router.tags += ["G2PConnect Mapper Sync"]
 
         self.router.add_api_route(

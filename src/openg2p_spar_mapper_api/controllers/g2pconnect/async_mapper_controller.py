@@ -47,7 +47,7 @@ class AsyncMapperController(BaseController):
 
         self.mapper_service = MapperService.get_component()
 
-        self.router.prefix += "/g2pconnect/mapper/async"
+        self.router.prefix += "/mapper/async"
         self.router.tags += ["G2PConnect Mapper Async"]
 
         self.action_to_method = {

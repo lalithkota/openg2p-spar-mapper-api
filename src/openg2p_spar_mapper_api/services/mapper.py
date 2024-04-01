@@ -50,7 +50,7 @@ class MapperService(BaseService):
 
                 try:
                     await IdFaMappingValidations.get_component().validate_link_request(
-                        connection=session, single_update_request=single_link_request
+                        connection=session, single_link_request=single_link_request
                     )
 
                     mappings_to_add.append(
@@ -120,7 +120,7 @@ class MapperService(BaseService):
             updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
             single_update_responses: list[SingleUpdateResponse] = []
 
-            for single_update_request in updateRequest.link_request:
+            for single_update_request in updateRequest.update_request:
 
                 try:
                     await IdFaMappingValidations.get_component().validate_update_request(
@@ -217,20 +217,15 @@ class MapperService(BaseService):
     async def resolve(self, request: Request):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
-            resolveRequest: ResolveRequest = ResolveRequest.model_validate(
-                request.message
-            )
-            mappings_to_add = []
+            resolveRequest: ResolveRequest = ResolveRequest.model_validate(request.message)
             single_resolve_responses: list[SingleResolveResponse] = []
 
             for single_resolve_request in resolveRequest.link_request:
-
                 try:
                     await IdFaMappingValidations.get_component().validate_resolve_request(
                         connection=session,
                         single_resolve_request=single_resolve_request,
                     )
-
                     stmt, is_rejected = await self.construct_query(
                         single_resolve_request
                     )
@@ -253,9 +248,7 @@ class MapperService(BaseService):
                             single_resolve_request, e
                         )
                     )
-
         await session.commit()
-
         return single_resolve_responses
 
     @staticmethod

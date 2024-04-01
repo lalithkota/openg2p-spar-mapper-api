@@ -61,12 +61,12 @@ class SyncResponseHelper(BaseService):
                 if link.status == StatusEnum.succ
             ]
         )
-        if completed_count == 0:
-            raise LinkValidationException(
-                message="All requests in transaction failed.",
-                status=StatusEnum.rjct,
-                validation_error_type=LinkStatusReasonCode.rjct_errors_too_many,
-            )
+        # if completed_count == 0:
+        #     raise LinkValidationException(
+        #         message="All requests in transaction failed.",
+        #         status=StatusEnum.rjct,
+        #         validation_error_type=LinkStatusReasonCode.rjct_errors_too_many,
+        #     )
 
         return SyncResponse(
             header=SyncResponseHeader(
@@ -106,12 +106,12 @@ class SyncResponseHelper(BaseService):
                 if link.status == StatusEnum.succ
             ]
         )
-        if completed_count == 0:
-            raise UpdateValidationException(
-                message="All requests in transaction failed.",
-                status=StatusEnum.rjct,
-                validation_error_type=UpdateStatusReasonCode.rjct_errors_too_many,
-            )
+        # if completed_count == 0:
+        #     raise UpdateValidationException(
+        #         message="All requests in transaction failed.",
+        #         status=StatusEnum.rjct,
+        #         validation_error_type=UpdateStatusReasonCode.rjct_errors_too_many,
+        #     )
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
@@ -150,12 +150,12 @@ class SyncResponseHelper(BaseService):
                 if link.status == StatusEnum.succ
             ]
         )
-        if completed_count == 0:
-            raise ResolveValidationException(
-                message="All requests in transaction failed.",
-                status=StatusEnum.rjct,
-                validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
-            )
+        # if completed_count == 0:
+        #     raise ResolveValidationException(
+        #         message="All requests in transaction failed.",
+        #         status=StatusEnum.rjct,
+        #         validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
+        #     )
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
@@ -194,12 +194,12 @@ class SyncResponseHelper(BaseService):
                 if link.status == StatusEnum.succ
             ]
         )
-        if completed_count == 0:
-            raise UnlinkValidationException(
-                message="All requests in transaction failed.",
-                status=StatusEnum.rjct,
-                validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
-            )
+        # if completed_count == 0:
+        #     raise UnlinkValidationException(
+        #         message="All requests in transaction failed.",
+        #         status=StatusEnum.rjct,
+        #         validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
+        #     )
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
