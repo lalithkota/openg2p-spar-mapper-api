@@ -9,7 +9,7 @@ from . import __version__
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="spar_g2pconnect_mapper_", env_file=".env", extra="allow"
+        env_prefix="spar_mapper_", env_file=".env", extra="allow"
     )
 
     openapi_title: str = "OpenG2P SPAR Account Mapper"
@@ -22,8 +22,8 @@ class Settings(BaseSettings):
     """
     openapi_version: str = __version__
 
-    db_dbname: str = "spar-db"
-    
+    db_dbname: str = "mapper-db"
+
     default_callback_url: Optional[AnyUrl] = None
     default_callback_timeout: int = 10
-    callback_sender_id: str = "spar.dev.openg2p.net"
+    callback_sender_id: str = "mapper.dev.openg2p.net"

@@ -42,6 +42,7 @@ class RequestValidation(BaseService):
         #         message=SyncUnlinkStatusReasonCodeEnum.rjct_action_not_supported,
         #     )
         return None
+
     @staticmethod
     def validate_request(request) -> None:
         # TODO: Validate the request

@@ -3,16 +3,22 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
     Request,
     SyncResponse,
 )
-from openg2p_g2pconnect_common_lib.spar.schemas.link import (
+from openg2p_g2pconnect_common_lib.mapper.schemas.link import (
     SingleLinkResponse,
 )
-from openg2p_g2pconnect_common_lib.spar.schemas.update import (
-    SingleUpdateResponse,
-)
-from openg2p_g2pconnect_common_lib.spar.schemas.resolve import (
+from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
     SingleResolveResponse,
 )
-from ...services import RequestValidation, SyncResponseHelper, MapperService, RequestValidationException
+from openg2p_g2pconnect_common_lib.mapper.schemas.update import (
+    SingleUpdateResponse,
+)
+
+from ..services import (
+    MapperService,
+    RequestValidation,
+    RequestValidationException,
+    SyncResponseHelper,
+)
 
 
 class SyncMapperController(BaseController):
@@ -55,36 +61,41 @@ class SyncMapperController(BaseController):
             RequestValidation.validate_request(request)
             RequestValidation.validate_link_request_header(request)
         except RequestValidationException as e:
-            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
-                request, e
+            error_response = (
+                SyncResponseHelper.get_component().construct_error_sync_response(
+                    request, e
+                )
             )
             return error_response
 
-        single_link_responses: list[SingleLinkResponse] = (
-            await self.mapper_service.link(request)
-        )
+        single_link_responses: list[
+            SingleLinkResponse
+        ] = await self.mapper_service.link(request)
         return SyncResponseHelper.get_component().construct_success_sync_link_response(
             request,
             single_link_responses,
         )
 
     async def update_sync(self, request: Request):
-
         try:
             RequestValidation.validate_request(request)
             RequestValidation.validate_update_request_header(request)
         except RequestValidationException as e:
-            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
-                request, e
+            error_response = (
+                SyncResponseHelper.get_component().construct_error_sync_response(
+                    request, e
+                )
             )
             return error_response
 
-        single_update_responses: list[SingleUpdateResponse] = (
-            await self.mapper_service.update(request)
-        )
-        return SyncResponseHelper.get_component().construct_success_sync_update_response(
-            request,
-            single_update_responses,
+        single_update_responses: list[
+            SingleUpdateResponse
+        ] = await self.mapper_service.update(request)
+        return (
+            SyncResponseHelper.get_component().construct_success_sync_update_response(
+                request,
+                single_update_responses,
+            )
         )
 
     async def resolve_sync(self, request: Request):
@@ -92,17 +103,21 @@ class SyncMapperController(BaseController):
             RequestValidation.validate_request(request)
             RequestValidation.validate_resolve_request_header(request)
         except RequestValidationException as e:
-            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
-                request, e
+            error_response = (
+                SyncResponseHelper.get_component().construct_error_sync_response(
+                    request, e
+                )
             )
             return error_response
 
-        single_resolve_responses: list[SingleResolveResponse] = (
-            await self.mapper_service.resolve(request)
-        )
-        return SyncResponseHelper.get_component().construct_success_sync_resolve_response(
-            request,
-            single_resolve_responses,
+        single_resolve_responses: list[
+            SingleResolveResponse
+        ] = await self.mapper_service.resolve(request)
+        return (
+            SyncResponseHelper.get_component().construct_success_sync_resolve_response(
+                request,
+                single_resolve_responses,
+            )
         )
 
     async def unlink_sync(self, request: Request):
@@ -110,15 +125,19 @@ class SyncMapperController(BaseController):
             RequestValidation.validate_request(request)
             RequestValidation.validate_unlink_request_header(request)
         except RequestValidationException as e:
-            error_response = SyncResponseHelper.get_component().construct_error_sync_response(
-                request, e
+            error_response = (
+                SyncResponseHelper.get_component().construct_error_sync_response(
+                    request, e
+                )
             )
             return error_response
 
-        single_unlink_responses: list[SingleResolveResponse] = (
-            await self.mapper_service.unlink(request)
-        )
-        return SyncResponseHelper.get_component().construct_success_sync_unlink_response(
-            request,
-            single_unlink_responses,
+        single_unlink_responses: list[
+            SingleResolveResponse
+        ] = await self.mapper_service.unlink(request)
+        return (
+            SyncResponseHelper.get_component().construct_success_sync_unlink_response(
+                request,
+                single_unlink_responses,
+            )
         )
