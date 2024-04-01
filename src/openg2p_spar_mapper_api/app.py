@@ -1,21 +1,22 @@
 # ruff: noqa: E402
 import asyncio
 
-from .config import Settings
 from openg2p_fastapi_common.app import Initializer as BaseInitializer
+
+from .config import Settings
 from .controllers import (
-    SyncMapperController,
     AsyncMapperController,
+    SyncMapperController,
 )
 from .models import IdFaMapping
 from .services import (
-    MapperService,
-    SyncRequestHelper,
-    RequestValidation,
-    SyncResponseHelper,
-    IdFaMappingValidations,
     AsyncRequestHelper,
     AsyncResponseHelper,
+    IdFaMappingValidations,
+    MapperService,
+    RequestValidation,
+    SyncRequestHelper,
+    SyncResponseHelper,
 )
 
 _config = Settings.get_config()

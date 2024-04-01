@@ -1,37 +1,30 @@
-from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
-    SingleResolveRequest,
-    ResolveStatusReasonCode,
-)
-
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkStatusReasonCode,
-    SingleUpdateRequest,
-    UpdateStatusReasonCode,
-    UnlinkStatusReasonCode,
+    ResolveStatusReasonCode,
+    SingleLinkRequest,
     SingleResolveRequest,
     SingleUnlinkRequest,
-    SingleLinkRequest,
-    ResolveStatusReasonCode,
+    SingleUpdateRequest,
+    UnlinkStatusReasonCode,
+    UpdateStatusReasonCode,
 )
 from sqlalchemy import and_, select
 
+from ..models import IdFaMapping
 from .exceptions import (
     LinkValidationException,
-    UpdateValidationException,
     ResolveValidationException,
     UnlinkValidationException,
+    UpdateValidationException,
 )
-from ..models import IdFaMapping
 
 
 class IdFaMappingValidations(BaseService):
-
     @staticmethod
     async def validate_link_request(
         connection, single_link_request: SingleLinkRequest
     ) -> None:
-
         # Check if the ID is null
         if not single_link_request.id:
             raise LinkValidationException(
@@ -69,7 +62,6 @@ class IdFaMappingValidations(BaseService):
     async def validate_update_request(
         connection, single_update_request: SingleUpdateRequest
     ) -> None:
-
         # Check if the ID is null
         if not single_update_request.id:
             raise UpdateValidationException(
@@ -107,7 +99,6 @@ class IdFaMappingValidations(BaseService):
     async def validate_resolve_request(
         connection, single_resolve_request: SingleResolveRequest
     ) -> None:
-
         # Check if the ID is null
         if not single_resolve_request.id:
             raise ResolveValidationException(
@@ -144,7 +135,6 @@ class IdFaMappingValidations(BaseService):
     async def validate_unlink_request(
         connection, single_unlink_request: SingleUnlinkRequest
     ) -> None:
-
         if not single_unlink_request.id:
             raise UnlinkValidationException(
                 message="ID is null",

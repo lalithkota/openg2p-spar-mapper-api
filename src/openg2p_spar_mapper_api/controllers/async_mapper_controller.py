@@ -1,25 +1,25 @@
 import asyncio
-import uuid
-import httpx
 import logging
+import uuid
 
+import httpx
 from openg2p_fastapi_common.controller import BaseController
 from openg2p_g2pconnect_common_lib.common.schemas import (
-    Request,
-    AsyncResponse,
     AsyncCallbackRequest,
+    AsyncResponse,
+    Request,
 )
 from openg2p_g2pconnect_common_lib.mapper.schemas.link import (
     SingleLinkResponse,
 )
-from src.openg2p_spar_mapper_api.config import Settings
-from src.openg2p_spar_mapper_api.services import (
-    RequestValidation,
+
+from ..config import Settings
+from ..services import (
     AsyncResponseHelper,
     MapperService,
+    RequestValidation,
     RequestValidationException,
 )
-
 
 _config = Settings.get_config()
 _logger = logging.getLogger(_config.logging_default_logger_name)
@@ -83,7 +83,6 @@ class AsyncMapperController(BaseController):
         )
 
     async def link_async(self, request: Request):
-
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
             self.handle_service_and_callback(request, correlation_id, "link")
@@ -94,7 +93,6 @@ class AsyncMapperController(BaseController):
         )
 
     async def update_async(self, request: Request):
-
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
             self.handle_service_and_callback(request, correlation_id, "update")
@@ -105,7 +103,6 @@ class AsyncMapperController(BaseController):
         )
 
     async def resolve_async(self, request: Request):
-
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
             self.handle_service_and_callback(request, correlation_id, "resolve")
@@ -116,7 +113,6 @@ class AsyncMapperController(BaseController):
         )
 
     async def unlink_async(self, request: Request):
-
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
             self.handle_service_and_callback(request, correlation_id, "unlink")
@@ -132,9 +128,9 @@ class AsyncMapperController(BaseController):
         try:
             RequestValidation.validate_request(request)
             RequestValidation.validate_link_request_header(request)
-            single_link_responses: list[SingleLinkResponse] = (
-                await self.action_to_method[action](request)
-            )
+            single_link_responses: list[
+                SingleLinkResponse
+            ] = await self.action_to_method[action](request)
             async_call_back_request: (
                 AsyncCallbackRequest
             ) = AsyncResponseHelper.get_component().construct_success_async_callback_request(

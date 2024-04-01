@@ -2,8 +2,8 @@ from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkStatusReasonCode,
     ResolveStatusReasonCode,
-    UpdateStatusReasonCode,
     UnlinkStatusReasonCode,
+    UpdateStatusReasonCode,
 )
 
 
