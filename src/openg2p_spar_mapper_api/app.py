@@ -1,9 +1,12 @@
 # ruff: noqa: E402
 import asyncio
 
+from .config import Settings
+
+_config = Settings.get_config()
+
 from openg2p_fastapi_common.app import Initializer as BaseInitializer
 
-from .config import Settings
 from .controllers import (
     AsyncMapperController,
     SyncMapperController,
@@ -18,8 +21,6 @@ from .services import (
     SyncRequestHelper,
     SyncResponseHelper,
 )
-
-_config = Settings.get_config()
 
 
 class Initializer(BaseInitializer):
