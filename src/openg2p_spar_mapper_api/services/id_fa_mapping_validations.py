@@ -67,11 +67,7 @@ class IdFaMappingValidations(BaseService):
     async def validate_update_request(
         connection, single_update_request: SingleUpdateRequest
     ) -> None:
-<<<<<<< HEAD
  
-=======
-        # Check if the ID is null
->>>>>>> upstream/develop
         if not single_update_request.id:
             raise UpdateValidationException(
                 message="ID is null",
@@ -90,13 +86,12 @@ class IdFaMappingValidations(BaseService):
             select(IdFaMapping).where(
                 and_(
                     IdFaMapping.id_value == single_update_request.id,
-                    IdFaMapping.fa_value == single_update_request.fa,
                 )
             )
         )
-        link_request_from_db = result.first()
+        update_request_from_db = result.first()
 
-        if link_request_from_db is None:
+        if not update_request_from_db :
             raise UpdateValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,
@@ -109,11 +104,6 @@ class IdFaMappingValidations(BaseService):
     async def validate_resolve_request(
         connection, single_resolve_request: SingleResolveRequest
     ) -> None:
-<<<<<<< HEAD
-
-=======
-        # Check if the ID is null
->>>>>>> upstream/develop
         if not single_resolve_request.id:
             raise ResolveValidationException(
                 message="ID is null",
@@ -136,9 +126,9 @@ class IdFaMappingValidations(BaseService):
                 )
             )
         )
-        link_request_from_db = result.first()
+        resolve_request_from_db = result.first()
 
-        if link_request_from_db:
+        if resolve_request_from_db:
             raise ResolveValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,
@@ -154,14 +144,14 @@ class IdFaMappingValidations(BaseService):
             raise UnlinkValidationException(
                 message="ID is null",
                 status=StatusEnum.rjct,
-                validation_error_type=UnlinkValidationException.rjct_id_invalid,
+                validation_error_type=UnlinkStatusReasonCode.rjct_id_invalid,
             )
 
         if not single_unlink_request.fa:
             raise UnlinkValidationException(
                 message="FA is null",
                 status=StatusEnum.rjct,
-                validation_error_type=UnlinkValidationException.rjct_fa_invalid,
+                validation_error_type=UnlinkStatusReasonCode.rjct_fa_invalid,
             )
         result = await connection.execute(
             select(IdFaMapping).where(
@@ -171,9 +161,9 @@ class IdFaMappingValidations(BaseService):
                 )
             )
         )
-        link_request_from_db = result.first()
+        unlink_request_from_db = result.first()
 
-        if link_request_from_db is None:
+        if not unlink_request_from_db :
             raise UnlinkValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,

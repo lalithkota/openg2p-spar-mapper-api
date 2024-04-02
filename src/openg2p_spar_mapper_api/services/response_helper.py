@@ -94,14 +94,14 @@ class SyncResponseHelper(BaseService):
         updateResponse: UpdateResponse = UpdateResponse(
             transaction_id=updateRequest.transaction_id,
             correlation_id=None,
-            link_response=single_update_responses,
+            update_response=single_update_responses,
         )
-        total_count = len(updateResponse.link_response)
+        total_count = len(updateResponse.update_response)
         completed_count = len(
             [
-                link
-                for link in updateResponse.link_response
-                if link.status == StatusEnum.succ
+                update
+                for update in updateResponse.update_response
+                if update.status == StatusEnum.succ
             ]
         )
         # if completed_count == 0:
@@ -138,14 +138,14 @@ class SyncResponseHelper(BaseService):
         resolveResponse: ResolveResponse = ResolveResponse(
             transaction_id=resolveRequest.transaction_id,
             correlation_id=None,
-            link_response=single_resolve_responses,
+            resolve_response=single_resolve_responses,
         )
-        total_count = len(resolveResponse.link_response)
+        total_count = len(resolveResponse.resolve_response)
         completed_count = len(
             [
-                link
-                for link in resolveResponse.link_response
-                if link.status == StatusEnum.succ
+                resolve
+                for resolve in resolveResponse.resolve_response
+                if resolve.status == StatusEnum.succ
             ]
         )
         # if completed_count == 0:
@@ -182,14 +182,14 @@ class SyncResponseHelper(BaseService):
         unlinkResponse: UnlinkResponse = UnlinkResponse(
             transaction_id=unlinkRequest.transaction_id,
             correlation_id=None,
-            link_response=single_unlink_responses,
+            unlink_response=single_unlink_responses,
         )
-        total_count = len(unlinkResponse.link_response)
+        total_count = len(unlinkResponse.unlink_response)
         completed_count = len(
             [
-                link
-                for link in unlinkResponse.link_response
-                if link.status == StatusEnum.succ
+                unlink
+                for unlink in unlinkResponse.unlink_response
+                if unlink.status == StatusEnum.succ
             ]
         )
         # if completed_count == 0:

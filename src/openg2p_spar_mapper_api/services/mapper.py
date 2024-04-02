@@ -24,6 +24,8 @@ from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from openg2p_g2pconnect_common_lib.mapper.schemas.update import SingleUpdateRequest
+
 from ..config import Settings
 from ..models import IdFaMapping
 from ..services.exceptions import (
@@ -118,7 +120,7 @@ class MapperService(BaseService):
             updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
             single_update_responses: list[SingleUpdateResponse] = []
 
-            for single_update_request in updateRequest.link_request:
+            for single_update_request in updateRequest.update_request:
 
                 try:
                     await IdFaMappingValidations.get_component().validate_update_request(
@@ -129,7 +131,43 @@ class MapperService(BaseService):
                             single_update_request
                         )
                     )
-                    await self.update_mapping(session, single_update_request)
+                    single_update_request: SingleUpdateRequest = SingleUpdateRequest.model_validate(single_update_request)
+                    single_response = (
+                        MapperService.construct_single_update_response_for_success(single_update_request)
+                    )
+                    result = await session.execute(
+                        select(IdFaMapping).where(IdFaMapping.id_value == single_update_request.id)
+                    )
+                    result = result.scalar()
+
+                    if result:
+                        if single_update_request.fa:
+                            result.fa_value = single_update_request.fa
+                        if single_update_request.name:
+                            result.name = single_update_request.name
+                        if single_update_request.phone_number:
+                            result.phone = single_update_request.phone_number
+                        if single_update_request.additional_info:
+                            addl_info_copy = (
+                                result.additional_info.copy() if result.additional_info else []
+                            )
+                            addl_info_keys = [info["name"] for info in addl_info_copy]
+                            for info in single_update_request.additional_info:
+                                if info.name in addl_info_keys:
+                                    addl_info_copy[
+                                        addl_info_keys.index(info.name)
+                                    ] = info.model_dump()
+                                else:
+                                    addl_info_copy.append(info.model_dump())
+                            result.additional_info = addl_info_copy
+                    else:
+                        single_response.status = StatusEnum.rjct
+                        single_response.status_reason_code = UpdateStatusReasonCode.rjct_id_invalid
+                        single_response.status_reason_message = (
+                            "Mapping doesnt exist against given ID. Use 'link' instead."
+                        )
+                    await session.commit()
+
                 except UpdateValidationException as e:
                     UpdateValidationException(
                         message="Mapping doesnt exist against given ID. Use 'link' instead.",
@@ -174,8 +212,9 @@ class MapperService(BaseService):
 
     @staticmethod
     async def update_mapping(session, single_update_request):
+        single_update_request: SingleUpdateRequest = SingleUpdateRequest.model_validate(single_update_request)
         single_response = (
-            single_update_request.construct_single_update_response_for_success()
+            MapperService.construct_single_update_response_for_success(single_update_request)
         )
         result = await session.execute(
             select(IdFaMapping).where(IdFaMapping.id_value == single_update_request.id)
@@ -195,9 +234,9 @@ class MapperService(BaseService):
                 )
                 addl_info_keys = [info["name"] for info in addl_info_copy]
                 for info in single_update_request.additional_info:
-                    if info.name in addl_info_keys:
+                    if info["name"] in addl_info_keys:
                         addl_info_copy[
-                            addl_info_keys.index(info.name)
+                            addl_info_keys.index(info["name"])
                         ] = info.model_dump()
                     else:
                         addl_info_copy.append(info.model_dump())
@@ -217,28 +256,27 @@ class MapperService(BaseService):
             resolveRequest: ResolveRequest = ResolveRequest.model_validate(
                 request.message
             )
-            mappings_to_add = []
             single_resolve_responses: list[SingleResolveResponse] = []
 
-            for single_resolve_request in resolveRequest.link_request:
+            for single_resolve_request in resolveRequest.resolve_request:
                 try:
                     await IdFaMappingValidations.get_component().validate_resolve_request(
                         connection=session,
                         single_resolve_request=single_resolve_request,
                     )
-                    stmt, is_rejected = await self.construct_query(
+                    stmt, is_rejected = await MapperService.construct_query(
                         single_resolve_request
                     )
                     if is_rejected:
                         return single_resolve_responses, True
 
-                    result = await self.execute_query(session, stmt)
-                    self.construct_single_resolve_response(
+                    result = await MapperService.execute_query(session, stmt)
+                    MapperService.construct_single_resolve(
                         single_resolve_request, result
                     )
 
                     single_resolve_responses.append(
-                        self.construct_single_resolve_response_for_success(
+                        MapperService.construct_single_resolve_response_for_success(
                             single_resolve_request
                         )
                     )
@@ -254,7 +292,7 @@ class MapperService(BaseService):
     @staticmethod
     def construct_single_resolve(single_resolve_request, result):
         single_response = (
-            single_resolve_request.construct_single_resolve_response_for_success()
+            MapperService.construct_single_resolve_response_for_success(single_resolve_request)
         )
 
         if result:
@@ -335,7 +373,7 @@ class MapperService(BaseService):
         return result.scalar() if result else None
 
     @staticmethod
-    def construct_single_resolve_response_for_success(single_resolve_request):
+    def construct_single_resolve_response_for_success(self,single_resolve_request):
         return SingleResolveResponse(
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
@@ -366,13 +404,15 @@ class MapperService(BaseService):
             unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
             single_unlink_responses: list[SingleUnlinkResponse] = []
             mappings_to_delete = []
-            for single_unlink_request in unlinkRequest.link_request:
+            for single_unlink_request in unlinkRequest.unlink_request:
+
                 try:
                     await IdFaMappingValidations.get_component().validate_unlink_request(
-                        connection=session, single_update_request=single_unlink_request
+                        connection=session, single_unlink_request=single_unlink_request
                     )
+                    print(single_unlink_request,'#######################################single')
                     mappings_to_delete.append(
-                        self.unlink_id_fa_mapping(single_unlink_request)
+                        MapperService.unlink_id_fa_mapping(single_unlink_request)
                     )
                     single_unlink_responses.append(
                         self.construct_single_unlink_response_for_success(
@@ -383,14 +423,20 @@ class MapperService(BaseService):
                     UnlinkValidationException(
                         message=" ID doesn't exist",
                         status=StatusEnum.rjct,
-                        validation_error_type=UnlinkStatusReasonCode.rjct_id_invalid,
+                        validation_error_type=UnlinkStatusReasonCode.rjct_reference_id_invalid,
                     )
                     single_unlink_responses.append(
                         self.construct_single_unlink_response_for_failure(
                             single_unlink_request, e
                         )
                     )
-        session.delete(*mappings_to_delete)
+        print(mappings_to_delete,'#######################################mapping')
+        
+        if mappings_to_delete:
+            session.delete(*mappings_to_delete)
+            await session.commit()
+        else:
+            print("No objects to delete")
         await session.commit()
         return single_unlink_responses
 
