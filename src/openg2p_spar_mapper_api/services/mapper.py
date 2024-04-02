@@ -21,10 +21,9 @@ from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
     ResolveScope,
     ResolveStatusReasonCode,
 )
+from openg2p_g2pconnect_common_lib.mapper.schemas.update import SingleUpdateRequest
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
-
-from openg2p_g2pconnect_common_lib.mapper.schemas.update import SingleUpdateRequest
 
 from ..config import Settings
 from ..models import IdFaMapping
@@ -121,7 +120,6 @@ class MapperService(BaseService):
             single_update_responses: list[SingleUpdateResponse] = []
 
             for single_update_request in updateRequest.update_request:
-
                 try:
                     await IdFaMappingValidations.get_component().validate_update_request(
                         connection=session, single_update_request=single_update_request
@@ -131,12 +129,18 @@ class MapperService(BaseService):
                             single_update_request
                         )
                     )
-                    single_update_request: SingleUpdateRequest = SingleUpdateRequest.model_validate(single_update_request)
+                    single_update_request: SingleUpdateRequest = (
+                        SingleUpdateRequest.model_validate(single_update_request)
+                    )
                     single_response = (
-                        MapperService.construct_single_update_response_for_success(single_update_request)
+                        MapperService.construct_single_update_response_for_success(
+                            single_update_request
+                        )
                     )
                     result = await session.execute(
-                        select(IdFaMapping).where(IdFaMapping.id_value == single_update_request.id)
+                        select(IdFaMapping).where(
+                            IdFaMapping.id_value == single_update_request.id
+                        )
                     )
                     result = result.scalar()
 
@@ -149,7 +153,9 @@ class MapperService(BaseService):
                             result.phone = single_update_request.phone_number
                         if single_update_request.additional_info:
                             addl_info_copy = (
-                                result.additional_info.copy() if result.additional_info else []
+                                result.additional_info.copy()
+                                if result.additional_info
+                                else []
                             )
                             addl_info_keys = [info["name"] for info in addl_info_copy]
                             for info in single_update_request.additional_info:
@@ -162,7 +168,9 @@ class MapperService(BaseService):
                             result.additional_info = addl_info_copy
                     else:
                         single_response.status = StatusEnum.rjct
-                        single_response.status_reason_code = UpdateStatusReasonCode.rjct_id_invalid
+                        single_response.status_reason_code = (
+                            UpdateStatusReasonCode.rjct_id_invalid
+                        )
                         single_response.status_reason_message = (
                             "Mapping doesnt exist against given ID. Use 'link' instead."
                         )
@@ -212,9 +220,11 @@ class MapperService(BaseService):
 
     @staticmethod
     async def update_mapping(session, single_update_request):
-        single_update_request: SingleUpdateRequest = SingleUpdateRequest.model_validate(single_update_request)
-        single_response = (
-            MapperService.construct_single_update_response_for_success(single_update_request)
+        single_update_request: SingleUpdateRequest = SingleUpdateRequest.model_validate(
+            single_update_request
+        )
+        single_response = MapperService.construct_single_update_response_for_success(
+            single_update_request
         )
         result = await session.execute(
             select(IdFaMapping).where(IdFaMapping.id_value == single_update_request.id)
@@ -291,8 +301,8 @@ class MapperService(BaseService):
 
     @staticmethod
     def construct_single_resolve(single_resolve_request, result):
-        single_response = (
-            MapperService.construct_single_resolve_response_for_success(single_resolve_request)
+        single_response = MapperService.construct_single_resolve_response_for_success(
+            single_resolve_request
         )
 
         if result:
@@ -373,7 +383,7 @@ class MapperService(BaseService):
         return result.scalar() if result else None
 
     @staticmethod
-    def construct_single_resolve_response_for_success(self,single_resolve_request):
+    def construct_single_resolve_response_for_success(self, single_resolve_request):
         return SingleResolveResponse(
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
@@ -405,12 +415,13 @@ class MapperService(BaseService):
             single_unlink_responses: list[SingleUnlinkResponse] = []
             mappings_to_delete = []
             for single_unlink_request in unlinkRequest.unlink_request:
-
                 try:
                     await IdFaMappingValidations.get_component().validate_unlink_request(
                         connection=session, single_unlink_request=single_unlink_request
                     )
-                    print(single_unlink_request,'#######################################single')
+                    print(
+                        single_unlink_request,
+                    )
                     mappings_to_delete.append(
                         MapperService.unlink_id_fa_mapping(single_unlink_request)
                     )
@@ -430,8 +441,7 @@ class MapperService(BaseService):
                             single_unlink_request, e
                         )
                     )
-        print(mappings_to_delete,'#######################################mapping')
-        
+
         if mappings_to_delete:
             session.delete(*mappings_to_delete)
             await session.commit()

@@ -15,10 +15,8 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkRequest,
     LinkResponse,
-    LinkStatusReasonCode,
     ResolveRequest,
     ResolveResponse,
-    ResolveStatusReasonCode,
     SingleLinkResponse,
     SingleResolveResponse,
     SingleUnlinkResponse,
@@ -27,15 +25,10 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     UnlinkResponse,
     UpdateRequest,
     UpdateResponse,
-    UpdateStatusReasonCode,
 )
 
 from .exceptions import (
-    LinkValidationException,
     RequestValidationException,
-    ResolveValidationException,
-    UnlinkValidationException,
-    UpdateValidationException,
 )
 
 

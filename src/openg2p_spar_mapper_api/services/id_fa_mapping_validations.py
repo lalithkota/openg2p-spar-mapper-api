@@ -1,4 +1,5 @@
 from openg2p_fastapi_common.service import BaseService
+from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkStatusReasonCode,
     ResolveStatusReasonCode,
@@ -9,8 +10,6 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     UnlinkStatusReasonCode,
     UpdateStatusReasonCode,
 )
-
-from openg2p_g2pconnect_common_lib.common.schemas import (StatusEnum)
 from sqlalchemy import and_, select
 
 from ..models import IdFaMapping
@@ -67,14 +66,13 @@ class IdFaMappingValidations(BaseService):
     async def validate_update_request(
         connection, single_update_request: SingleUpdateRequest
     ) -> None:
- 
         if not single_update_request.id:
             raise UpdateValidationException(
                 message="ID is null",
                 status=StatusEnum.rjct,
                 validation_error_type=UpdateStatusReasonCode.rjct_id_invalid,
             )
-       
+
         if not single_update_request.fa:
             raise UpdateValidationException(
                 message="FA is null",
@@ -91,7 +89,7 @@ class IdFaMappingValidations(BaseService):
         )
         update_request_from_db = result.first()
 
-        if not update_request_from_db :
+        if not update_request_from_db:
             raise UpdateValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,
@@ -163,7 +161,7 @@ class IdFaMappingValidations(BaseService):
         )
         unlink_request_from_db = result.first()
 
-        if not unlink_request_from_db :
+        if not unlink_request_from_db:
             raise UnlinkValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,

@@ -109,7 +109,7 @@ class SyncMapperController(BaseController):
                 )
             )
             return error_response
-        
+
         single_resolve_responses: list[
             SingleResolveResponse
         ] = await self.mapper_service.resolve(request)
