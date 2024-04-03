@@ -36,11 +36,11 @@ class RequestValidation(BaseService):
 
     @staticmethod
     def validate_unlink_request_header(request) -> None:
-        # if request.header.action != "unlink":
-        #     raise RequestValidationException(
-        #         code=SyncUnlinkStatusReasonCodeEnum.rjct_action_not_supported,
-        #         message=SyncUnlinkStatusReasonCodeEnum.rjct_action_not_supported,
-        #     )
+        if request.header.action != "unlink":
+            raise RequestValidationException(
+                code=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported,
+                message=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported,
+            )
         return None
 
     @staticmethod
