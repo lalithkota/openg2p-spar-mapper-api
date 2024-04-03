@@ -112,10 +112,13 @@ class SyncMapperController(BaseController):
         single_resolve_responses: list[
             SingleResolveResponse
         ] = await self.mapper_service.resolve(request)
-        return SyncResponseHelper.get_component().construct_success_sync_resolve_response(
-            request,
-            single_resolve_responses,
+        return (
+            SyncResponseHelper.get_component().construct_success_sync_resolve_response(
+                request,
+                single_resolve_responses,
+            )
         )
+
     async def unlink_sync(self, request: Request):
         try:
             RequestValidation.validate_request(request)

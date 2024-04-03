@@ -272,7 +272,6 @@ class AsyncResponseHelper(BaseService):
             [link for link in single_link_responses if link.status == StatusEnum.succ]
         )
         linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
-        
 
         linkResponse: LinkResponse = LinkResponse(
             transaction_id=linkRequest.transaction_id,
@@ -298,7 +297,7 @@ class AsyncResponseHelper(BaseService):
             ),
             message=linkResponse,
         )
-    
+
     def construct_success_async_callback_update_request(
         self,
         request: Request,
@@ -307,7 +306,11 @@ class AsyncResponseHelper(BaseService):
     ) -> AsyncCallbackRequest:
         total_count = len(single_update_responses)
         completed_count = len(
-            [update for update in single_update_responses if update.status == StatusEnum.succ]
+            [
+                update
+                for update in single_update_responses
+                if update.status == StatusEnum.succ
+            ]
         )
         updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
         updateResponse: UpdateResponse = UpdateResponse(
@@ -334,7 +337,7 @@ class AsyncResponseHelper(BaseService):
             ),
             message=updateResponse,
         )
-    
+
     def construct_success_async_callback_resolve_request(
         self,
         request: Request,
@@ -343,7 +346,11 @@ class AsyncResponseHelper(BaseService):
     ) -> AsyncCallbackRequest:
         total_count = len(single_resolve_responses)
         completed_count = len(
-            [resolve for resolve in single_resolve_responses if resolve.status == StatusEnum.succ]
+            [
+                resolve
+                for resolve in single_resolve_responses
+                if resolve.status == StatusEnum.succ
+            ]
         )
         resolveRequest: ResolveRequest = ResolveRequest.model_validate(request.message)
         resolveResponse: ResolveResponse = ResolveResponse(
@@ -370,7 +377,7 @@ class AsyncResponseHelper(BaseService):
             ),
             message=resolveResponse,
         )
-    
+
     def construct_success_async_callback_unlink_request(
         self,
         request: Request,
@@ -379,7 +386,11 @@ class AsyncResponseHelper(BaseService):
     ) -> AsyncCallbackRequest:
         total_count = len(single_unlink_responses)
         completed_count = len(
-            [unlink for unlink in single_unlink_responses if unlink.status == StatusEnum.succ]
+            [
+                unlink
+                for unlink in single_unlink_responses
+                if unlink.status == StatusEnum.succ
+            ]
         )
         unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
         unlinkResponse: UnlinkResponse = UnlinkResponse(
@@ -406,7 +417,6 @@ class AsyncResponseHelper(BaseService):
             ),
             message=unlinkResponse,
         )
-    
 
     def construct_error_async_callback_request(
         self,

@@ -169,4 +169,3 @@ class IdFaMappingValidations(BaseService):
             )
 
         return None
-
