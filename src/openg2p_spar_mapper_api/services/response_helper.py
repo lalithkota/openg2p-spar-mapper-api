@@ -261,7 +261,7 @@ class AsyncResponseHelper(BaseService):
             )
         )
 
-    def construct_success_async_callback_request(
+    def construct_success_async_callback_link_request(
         self,
         request: Request,
         correlation_id: str,
@@ -272,6 +272,8 @@ class AsyncResponseHelper(BaseService):
             [link for link in single_link_responses if link.status == StatusEnum.succ]
         )
         linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
+        
+
         linkResponse: LinkResponse = LinkResponse(
             transaction_id=linkRequest.transaction_id,
             correlation_id=None,
@@ -296,6 +298,115 @@ class AsyncResponseHelper(BaseService):
             ),
             message=linkResponse,
         )
+    
+    def construct_success_async_callback_update_request(
+        self,
+        request: Request,
+        correlation_id: str,
+        single_update_responses: list[SingleUpdateResponse],
+    ) -> AsyncCallbackRequest:
+        total_count = len(single_update_responses)
+        completed_count = len(
+            [update for update in single_update_responses if update.status == StatusEnum.succ]
+        )
+        updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
+        updateResponse: UpdateResponse = UpdateResponse(
+            transaction_id=updateRequest.transaction_id,
+            correlation_id=None,
+            update_response=single_update_responses,
+        )
+        return AsyncCallbackRequest(
+            signature=None,
+            header=AsyncCallbackRequestHeader(
+                version="1.0.0",
+                message_id=request.header.message_id,
+                message_ts=datetime.now().isoformat(),
+                action=request.header.action,
+                status=StatusEnum.succ,
+                status_reason_code=None,
+                status_reason_message=None,
+                total_count=total_count,
+                completed_count=completed_count,
+                sender_id=request.header.sender_id,
+                receiver_id=request.header.receiver_id,
+                is_msg_encrypted=False,
+                meta={},
+            ),
+            message=updateResponse,
+        )
+    
+    def construct_success_async_callback_resolve_request(
+        self,
+        request: Request,
+        correlation_id: str,
+        single_resolve_responses: list[SingleResolveResponse],
+    ) -> AsyncCallbackRequest:
+        total_count = len(single_resolve_responses)
+        completed_count = len(
+            [resolve for resolve in single_resolve_responses if resolve.status == StatusEnum.succ]
+        )
+        resolveRequest: ResolveRequest = ResolveRequest.model_validate(request.message)
+        resolveResponse: ResolveResponse = ResolveResponse(
+            transaction_id=resolveRequest.transaction_id,
+            correlation_id=None,
+            resolve_response=single_resolve_responses,
+        )
+        return AsyncCallbackRequest(
+            signature=None,
+            header=AsyncCallbackRequestHeader(
+                version="1.0.0",
+                message_id=request.header.message_id,
+                message_ts=datetime.now().isoformat(),
+                action=request.header.action,
+                status=StatusEnum.succ,
+                status_reason_code=None,
+                status_reason_message=None,
+                total_count=total_count,
+                completed_count=completed_count,
+                sender_id=request.header.sender_id,
+                receiver_id=request.header.receiver_id,
+                is_msg_encrypted=False,
+                meta={},
+            ),
+            message=resolveResponse,
+        )
+    
+    def construct_success_async_callback_unlink_request(
+        self,
+        request: Request,
+        correlation_id: str,
+        single_unlink_responses: list[SingleUnlinkResponse],
+    ) -> AsyncCallbackRequest:
+        total_count = len(single_unlink_responses)
+        completed_count = len(
+            [unlink for unlink in single_unlink_responses if unlink.status == StatusEnum.succ]
+        )
+        unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
+        unlinkResponse: UnlinkResponse = UnlinkResponse(
+            transaction_id=unlinkRequest.transaction_id,
+            correlation_id=None,
+            unlink_response=single_unlink_responses,
+        )
+        return AsyncCallbackRequest(
+            signature=None,
+            header=AsyncCallbackRequestHeader(
+                version="1.0.0",
+                message_id=request.header.message_id,
+                message_ts=datetime.now().isoformat(),
+                action=request.header.action,
+                status=StatusEnum.succ,
+                status_reason_code=None,
+                status_reason_message=None,
+                total_count=total_count,
+                completed_count=completed_count,
+                sender_id=request.header.sender_id,
+                receiver_id=request.header.receiver_id,
+                is_msg_encrypted=False,
+                meta={},
+            ),
+            message=unlinkResponse,
+        )
+    
 
     def construct_error_async_callback_request(
         self,

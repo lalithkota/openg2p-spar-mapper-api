@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+
 from openg2p_fastapi_common.context import dbengine
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import Request, StatusEnum
@@ -20,8 +21,9 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
 from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
     ResolveScope,
     ResolveStatusReasonCode,
+    SingleResolveRequest,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas.update import SingleUpdateRequest
+from openg2p_g2pconnect_common_lib.mapper.schemas.update import AdditionalInfo, SingleUpdateRequest
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -76,8 +78,8 @@ class MapperService(BaseService):
         await session.commit()
         return single_link_responses
 
-    @staticmethod
-    def construct_id_fa_mapping(single_link_request):
+   
+    def construct_id_fa_mapping(self,single_link_request):
         return IdFaMapping(
             id_value=single_link_request.id,
             fa_value=single_link_request.fa,
@@ -87,8 +89,8 @@ class MapperService(BaseService):
             active=True,
         )
 
-    @staticmethod
-    def construct_single_link_response_for_success(single_link_request):
+   
+    def construct_single_link_response_for_success(self,single_link_request):
         return SingleLinkResponse(
             reference_id=single_link_request.reference_id,
             timestamp=datetime.now(),
@@ -100,8 +102,8 @@ class MapperService(BaseService):
             locale=single_link_request.locale,
         )
 
-    @staticmethod
-    def construct_single_link_response_for_failure(single_link_request, error):
+   
+    def construct_single_link_response_for_failure(self,single_link_request, error):
         return SingleLinkResponse(
             reference_id=single_link_request.reference_id,
             timestamp=datetime.now(),
@@ -112,6 +114,8 @@ class MapperService(BaseService):
             additional_info=None,
             locale=single_link_request.locale,
         )
+
+
 
     async def update(self, request: Request):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
@@ -124,57 +128,18 @@ class MapperService(BaseService):
                     await IdFaMappingValidations.get_component().validate_update_request(
                         connection=session, single_update_request=single_update_request
                     )
+                    single_update_request: SingleUpdateRequest = (
+                        SingleUpdateRequest.model_validate(single_update_request)
+                    )
+
                     single_update_responses.append(
                         self.construct_single_update_response_for_success(
                             single_update_request
                         )
                     )
-                    single_update_request: SingleUpdateRequest = (
-                        SingleUpdateRequest.model_validate(single_update_request)
-                    )
-                    single_response = (
-                        MapperService.construct_single_update_response_for_success(
-                            single_update_request
-                        )
-                    )
-                    result = await session.execute(
-                        select(IdFaMapping).where(
-                            IdFaMapping.id_value == single_update_request.id
-                        )
-                    )
-                    result = result.scalar()
 
-                    if result:
-                        if single_update_request.fa:
-                            result.fa_value = single_update_request.fa
-                        if single_update_request.name:
-                            result.name = single_update_request.name
-                        if single_update_request.phone_number:
-                            result.phone = single_update_request.phone_number
-                        if single_update_request.additional_info:
-                            addl_info_copy = (
-                                result.additional_info.copy()
-                                if result.additional_info
-                                else []
-                            )
-                            addl_info_keys = [info["name"] for info in addl_info_copy]
-                            for info in single_update_request.additional_info:
-                                if info.name in addl_info_keys:
-                                    addl_info_copy[
-                                        addl_info_keys.index(info.name)
-                                    ] = info.model_dump()
-                                else:
-                                    addl_info_copy.append(info.model_dump())
-                            result.additional_info = addl_info_copy
-                    else:
-                        single_response.status = StatusEnum.rjct
-                        single_response.status_reason_code = (
-                            UpdateStatusReasonCode.rjct_id_invalid
-                        )
-                        single_response.status_reason_message = (
-                            "Mapping doesnt exist against given ID. Use 'link' instead."
-                        )
-                    await session.commit()
+                    await self.update_mapping(session, single_update_request)
+                    
 
                 except UpdateValidationException as e:
                     UpdateValidationException(
@@ -191,39 +156,13 @@ class MapperService(BaseService):
         await session.commit()
 
         return single_update_responses
-
-    @staticmethod
-    def construct_single_update_response_for_success(single_update_request):
-        return SingleUpdateResponse(
-            reference_id=single_update_request.reference_id,
-            timestamp=datetime.now(),
-            fa=single_update_request.fa,
-            status=StatusEnum.succ,
-            status_reason_code=None,
-            status_reason_message=None,
-            additional_info=None,
-            locale=single_update_request.locale,
-        )
-
-    @staticmethod
-    def construct_single_update_response_for_failure(single_update_request, error):
-        return SingleUpdateResponse(
-            reference_id=single_update_request.reference_id,
-            timestamp=datetime.now(),
-            fa=single_update_request.fa,
-            status=StatusEnum.rjct,
-            status_reason_code=error.validation_error_type,
-            status_reason_message=error.message,
-            additional_info=None,
-            locale=single_update_request.locale,
-        )
-
-    @staticmethod
-    async def update_mapping(session, single_update_request):
+ 
+   
+    async def update_mapping(self,session, single_update_request):
         single_update_request: SingleUpdateRequest = SingleUpdateRequest.model_validate(
             single_update_request
         )
-        single_response = MapperService.construct_single_update_response_for_success(
+        single_response = self.construct_single_update_response_for_success(
             single_update_request
         )
         result = await session.execute(
@@ -243,13 +182,13 @@ class MapperService(BaseService):
                     result.additional_info.copy() if result.additional_info else []
                 )
                 addl_info_keys = [info["name"] for info in addl_info_copy]
-                for info in single_update_request.additional_info:
-                    if info["name"] in addl_info_keys:
-                        addl_info_copy[
-                            addl_info_keys.index(info["name"])
-                        ] = info.model_dump()
-                    else:
-                        addl_info_copy.append(info.model_dump())
+                # for info in single_update_request.additional_info:
+                #     if info["name"] in addl_info_keys:
+                #         addl_info_copy[
+                #             addl_info_keys.index(info["name"])
+                #         ] = info.model_dump()
+                #     else:
+                #         addl_info_copy.append(info.model_dump())
                 result.additional_info = addl_info_copy
         else:
             single_response.status = StatusEnum.rjct
@@ -258,8 +197,32 @@ class MapperService(BaseService):
                 "Mapping doesnt exist against given ID. Use 'link' instead."
             )
         await session.commit()
+    def construct_single_update_response_for_success(self,single_update_request):
+        return SingleUpdateResponse(
+            reference_id=single_update_request.reference_id,
+            timestamp=datetime.now(),
+            fa=single_update_request.fa,
+            status=StatusEnum.succ,
+            status_reason_code=None,
+            status_reason_message=None,
+            additional_info=None,
+            locale=single_update_request.locale,
+        )
 
-    @staticmethod
+   
+    def construct_single_update_response_for_failure(self,single_update_request, error):
+        return SingleUpdateResponse(
+            reference_id=single_update_request.reference_id,
+            timestamp=datetime.now(),
+            fa=single_update_request.fa,
+            status=StatusEnum.rjct,
+            status_reason_code=error.validation_error_type,
+            status_reason_message=error.message,
+            additional_info=None,
+            locale=single_update_request.locale,
+        )
+
+
     async def resolve(self, request: Request):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
@@ -274,45 +237,40 @@ class MapperService(BaseService):
                         connection=session,
                         single_resolve_request=single_resolve_request,
                     )
-                    stmt, is_rejected = await MapperService.construct_query(
-                        single_resolve_request
+                    single_resolve_request: SingleResolveRequest = (
+                        SingleResolveRequest.model_validate(single_resolve_request)
                     )
-                    if is_rejected:
-                        return single_resolve_responses, True
-
-                    result = await MapperService.execute_query(session, stmt)
-                    MapperService.construct_single_resolve(
-                        single_resolve_request, result
+                    stmt, result = await self.construct_query(
+                    session, single_resolve_request
                     )
-
+                    self.construct_single_resolve(single_resolve_request, result)
+                    
                     single_resolve_responses.append(
-                        MapperService.construct_single_resolve_response_for_success(
+                        self.construct_single_resolve_response_for_success(
                             single_resolve_request
                         )
                     )
                 except ResolveValidationException as e:
-                    single_resolve_request.append(
+                    single_resolve_responses.append(
                         self.construct_single_resolve_response_for_failure(
                             single_resolve_request, e
                         )
                     )
         await session.commit()
         return single_resolve_responses
-
-    @staticmethod
-    def construct_single_resolve(single_resolve_request, result):
-        single_response = MapperService.construct_single_resolve_response_for_success(
+   
+    def construct_single_resolve(self,single_resolve_request, result):
+        single_response = self.construct_single_resolve_response_for_success(
             single_resolve_request
         )
-
         if result:
             if single_resolve_request.scope == ResolveScope.details:
                 single_response.fa = result.fa_value
                 single_response.id = result.id_value
                 single_response.additional_info = (
                     [
-                        # AdditionalInfo.model_validate(info)
-                        # for info in result.additional_info
+                        AdditionalInfo.model_validate(info)
+                        for info in result.additional_info
                     ]
                     if result.additional_info
                     else None
@@ -353,37 +311,40 @@ class MapperService(BaseService):
                     "Mapping not found against given ID."
                 )
 
-    @staticmethod
-    async def construct_query(each_req):
-        id_query = IdFaMapping.id_value == each_req.id
-        fa_query = IdFaMapping.fa_value == each_req.fa
-        if each_req.id and each_req.id.endswith("@") and ":" in each_req.id:
-            id_query = IdFaMapping.id_value.like(f"%{each_req.id}%")
-        if each_req.fa and each_req.fa.endswith("@") and ":" in each_req.fa:
-            fa_query = IdFaMapping.fa_value.like(f"%{each_req.fa}%")
+    async def construct_query(self,session,single_resolve_request):
+        single_response = (
+        self.construct_single_resolve_response_for_success(single_resolve_request))
+        # single_response = SingleResolveResponse()
+        stmt=None
+        id_query = IdFaMapping.id_value == single_resolve_request.id
+        fa_query = IdFaMapping.fa_value == single_resolve_request.fa
+        if single_resolve_request.id and single_resolve_request.id.endswith("@") and ":" in single_resolve_request.id:
+            id_query = IdFaMapping.id_value.like(f"%{single_resolve_request.id}%")
+        if single_resolve_request.fa and single_resolve_request.fa.endswith("@") and ":" in single_resolve_request.fa:
+            fa_query = IdFaMapping.fa_value.like(f"%{single_resolve_request.fa}%")
 
-        stmt = None
-        if each_req.id and each_req.fa:
+        if single_resolve_request.id and single_resolve_request.fa:
             stmt = select(IdFaMapping).where(and_(id_query, fa_query))
-        elif each_req.id:
+        elif single_resolve_request.id:
             stmt = select(IdFaMapping).where(id_query)
-        elif each_req.fa:
+        elif single_resolve_request.fa:
             stmt = select(IdFaMapping).where(fa_query)
         else:
-            raise ResolveValidationException(
-                message="Neither ID (nor FA) is given.",
-                status=StatusEnum.rjct,
-                validation_error_type=ResolveStatusReasonCode.rjct_id_invalid,
-            )  # Indicates query construction failure
-        return stmt, False
-
-    @staticmethod
-    async def execute_query(session, stmt):
+            single_response.status = StatusEnum.rjct
+            single_response.status_reason_code = (
+                ResolveStatusReasonCode.rjct_id_invalid
+            )
+            single_response.status_reason_message = (
+                "Neither ID (nor FA) is given."
+            )
         result = await session.execute(stmt)
-        return result.scalar() if result else None
+        result = result.scalar()
+        # result = result.fetchall()
+        return stmt, result
+    
 
-    @staticmethod
-    def construct_single_resolve_response_for_success(self, single_resolve_request):
+   
+    def construct_single_resolve_response_for_success(self,single_resolve_request):
         return SingleResolveResponse(
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
@@ -395,8 +356,8 @@ class MapperService(BaseService):
             locale=single_resolve_request.locale,
         )
 
-    @staticmethod
-    def construct_single_resolve_response_for_failure(single_resolve_request, error):
+   
+    def construct_single_resolve_response_for_failure(self,single_resolve_request, error):
         return SingleResolveResponse(
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
@@ -423,7 +384,7 @@ class MapperService(BaseService):
                         single_unlink_request,
                     )
                     mappings_to_delete.append(
-                        MapperService.unlink_id_fa_mapping(single_unlink_request)
+                        self.unlink_id_fa_mapping(single_unlink_request)
                     )
                     single_unlink_responses.append(
                         self.construct_single_unlink_response_for_success(
@@ -441,17 +402,15 @@ class MapperService(BaseService):
                             single_unlink_request, e
                         )
                     )
-
-        if mappings_to_delete:
-            session.delete(*mappings_to_delete)
-            await session.commit()
-        else:
-            print("No objects to delete")
+                if mappings_to_delete:
+                    session.delete(*mappings_to_delete)
+                    await session.commit()
+                else:
+                    print("No objects to delete")
         await session.commit()
         return single_unlink_responses
 
-    @staticmethod
-    def unlink_id_fa_mapping(single_unlink_request):
+    def unlink_id_fa_mapping(self, single_unlink_request):
         return IdFaMapping(
             id_value=single_unlink_request.id,
             fa_value=single_unlink_request.fa,
@@ -461,8 +420,9 @@ class MapperService(BaseService):
             active=True,
         )
 
-    @staticmethod
-    def construct_single_unlink_response_for_success(single_unlink_request):
+
+   
+    def construct_single_unlink_response_for_success(self,single_unlink_request):
         return SingleUnlinkResponse(
             reference_id=single_unlink_request.reference_id,
             timestamp=datetime.now(),
@@ -474,8 +434,8 @@ class MapperService(BaseService):
             locale=single_unlink_request.locale,
         )
 
-    @staticmethod
-    def construct_single_unlink_response_for_failure(single_unlink_request, error):
+   
+    def construct_single_unlink_response_for_failure(self,single_unlink_request, error):
         return SingleUnlinkResponse(
             reference_id=single_unlink_request.reference_id,
             timestamp=datetime.now(),

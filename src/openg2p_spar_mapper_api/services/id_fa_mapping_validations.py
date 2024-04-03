@@ -126,7 +126,7 @@ class IdFaMappingValidations(BaseService):
         )
         resolve_request_from_db = result.first()
 
-        if resolve_request_from_db:
+        if not resolve_request_from_db:
             raise ResolveValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,
@@ -169,3 +169,4 @@ class IdFaMappingValidations(BaseService):
             )
 
         return None
+

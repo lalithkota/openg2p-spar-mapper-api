@@ -12,6 +12,9 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
 from openg2p_g2pconnect_common_lib.mapper.schemas.link import (
     SingleLinkResponse,
 )
+from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import SingleResolveResponse
+from openg2p_g2pconnect_common_lib.mapper.schemas.unlink import SingleUnlinkResponse
+from openg2p_g2pconnect_common_lib.mapper.schemas.update import SingleUpdateResponse
 
 from ..config import Settings
 from ..services import (
@@ -83,9 +86,10 @@ class AsyncMapperController(BaseController):
         )
 
     async def link_async(self, request: Request):
+        
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
-            self.handle_service_and_callback(request, correlation_id, "link")
+            self.handle_service_and_link_callback(request, correlation_id, "link")
         )
         return AsyncResponseHelper.get_component().construct_success_async_response(
             request,
@@ -95,7 +99,7 @@ class AsyncMapperController(BaseController):
     async def update_async(self, request: Request):
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
-            self.handle_service_and_callback(request, correlation_id, "update")
+            self.handle_service_and_update_callback(request, correlation_id, "update")
         )
         return AsyncResponseHelper.get_component().construct_success_async_response(
             request,
@@ -105,7 +109,7 @@ class AsyncMapperController(BaseController):
     async def resolve_async(self, request: Request):
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
-            self.handle_service_and_callback(request, correlation_id, "resolve")
+            self.handle_service_and_resolve_callback(request, correlation_id, "resolve")
         )
         return AsyncResponseHelper.get_component().construct_success_async_response(
             request,
@@ -115,14 +119,14 @@ class AsyncMapperController(BaseController):
     async def unlink_async(self, request: Request):
         correlation_id = str(uuid.uuid4())
         await asyncio.create_task(
-            self.handle_service_and_callback(request, correlation_id, "unlink")
+            self.handle_service_and_resolve_callback(request, correlation_id, "unlink")
         )
         return AsyncResponseHelper.get_component().construct_success_async_response(
             request,
             correlation_id,
         )
 
-    async def handle_service_and_callback(
+    async def handle_service_and_link_callback(
         self, request: Request, correlation_id: str, action: str
     ):
         try:
@@ -133,7 +137,7 @@ class AsyncMapperController(BaseController):
             ] = await self.action_to_method[action](request)
             async_call_back_request: (
                 AsyncCallbackRequest
-            ) = AsyncResponseHelper.get_component().construct_success_async_callback_request(
+            ) = AsyncResponseHelper.get_component().construct_success_async_callback_link_request(
                 request, correlation_id, single_link_responses
             )
             await self.make_callback(
@@ -151,6 +155,97 @@ class AsyncMapperController(BaseController):
                 url=request.header.sender_uri,
                 url_suffix=f"/on-{action}",
             )
+    async def handle_service_and_update_callback(
+            self, request: Request, correlation_id: str, action: str
+        ):
+            try:
+                RequestValidation.validate_request(request)
+                RequestValidation.validate_update_request_header(request)
+                single_update_responses: list[
+                    SingleUpdateResponse
+                ] = await self.action_to_method[action](request)
+                async_call_back_request: (
+                    AsyncCallbackRequest
+                ) = AsyncResponseHelper.get_component().construct_success_async_callback_update_request(
+                    request, correlation_id, single_update_responses
+                )
+                await self.make_callback(
+                    async_call_back_request,
+                    url=request.header.sender_uri,
+                    url_suffix=f"/on-{action}",
+                )
+            except RequestValidationException as e:
+                _logger.error(f"Error in handle_service_and_callback: {e}")
+                error_response = AsyncResponseHelper.get_component().construct_error_async_callback_request(
+                    request, correlation_id, e
+                )
+                await self.make_callback(
+                    error_response,
+                    url=request.header.sender_uri,
+                    url_suffix=f"/on-{action}",
+                )
+
+    async def handle_service_and_resolve_callback(
+        self, request: Request, correlation_id: str, action: str
+    ):
+        try:
+            RequestValidation.validate_request(request)
+            RequestValidation.validate_resolve_request_header(request)
+            single_resolve_responses: list[
+                SingleResolveResponse
+            ] = await self.action_to_method[action](request)
+            async_call_back_request: (
+                AsyncCallbackRequest
+            ) = AsyncResponseHelper.get_component().construct_success_async_callback_resolve_request(
+                request, correlation_id, single_resolve_responses
+            )
+            await self.make_callback(
+                async_call_back_request,
+                url=request.header.sender_uri,
+                url_suffix=f"/on-{action}",
+            )
+        except RequestValidationException as e:
+            _logger.error(f"Error in handle_service_and_callback: {e}")
+            error_response = AsyncResponseHelper.get_component().construct_error_async_callback_request(
+                request, correlation_id, e
+            )
+            await self.make_callback(
+                error_response,
+                url=request.header.sender_uri,
+                url_suffix=f"/on-{action}",
+            )
+
+
+    async def handle_service_and_unlink_callback(
+        self, request: Request, correlation_id: str, action: str
+    ):
+        try:
+            RequestValidation.validate_request(request)
+            RequestValidation.validate_unlink_request_header(request)
+            single_unlink_responses: list[
+                SingleUnlinkResponse
+            ] = await self.action_to_method[action](request)
+            async_call_back_request: (
+                AsyncCallbackRequest
+            ) = AsyncResponseHelper.get_component().construct_success_async_callback_unlink_request(
+                request, correlation_id, single_unlink_responses
+            )
+            await self.make_callback(
+                async_call_back_request,
+                url=request.header.sender_uri,
+                url_suffix=f"/on-{action}",
+            )
+        except RequestValidationException as e:
+            _logger.error(f"Error in handle_service_and_callback: {e}")
+            error_response = AsyncResponseHelper.get_component().construct_error_async_callback_request(
+                request, correlation_id, e
+            )
+            await self.make_callback(
+                error_response,
+                url=request.header.sender_uri,
+                url_suffix=f"/on-{action}",
+            )
+
 
     @staticmethod
     async def make_callback(
