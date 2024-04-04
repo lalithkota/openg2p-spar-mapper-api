@@ -13,7 +13,6 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     SingleUnlinkResponse,
     SingleUpdateResponse,
     UnlinkRequest,
-    UnlinkStatusReasonCode,
     UpdateRequest,
     UpdateStatusReasonCode,
 )
@@ -26,7 +25,7 @@ from openg2p_g2pconnect_common_lib.mapper.schemas.update import (
     AdditionalInfo,
     SingleUpdateRequest,
 )
-from sqlalchemy import and_, select
+from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from ..config import Settings
@@ -195,9 +194,9 @@ class MapperService(BaseService):
 
     def construct_single_update_response_for_success(self, single_update_request):
         return SingleUpdateResponse(
+            id=single_update_request.id,
             reference_id=single_update_request.reference_id,
             timestamp=datetime.now(),
-            fa=single_update_request.fa,
             status=StatusEnum.succ,
             status_reason_code=None,
             status_reason_message=None,
@@ -311,7 +310,6 @@ class MapperService(BaseService):
         single_response = self.construct_single_resolve_response_for_success(
             single_resolve_request
         )
-        # single_response = SingleResolveResponse()
         stmt = None
         id_query = IdFaMapping.id_value == single_resolve_request.id
         fa_query = IdFaMapping.fa_value == single_resolve_request.fa
@@ -340,11 +338,11 @@ class MapperService(BaseService):
             single_response.status_reason_message = "Neither ID (nor FA) is given."
         result = await session.execute(stmt)
         result = result.scalar()
-        # result = result.fetchall()
         return stmt, result
 
     def construct_single_resolve_response_for_success(self, single_resolve_request):
         return SingleResolveResponse(
+            id=single_resolve_request.id,
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
             fa=single_resolve_request.fa,
@@ -374,17 +372,15 @@ class MapperService(BaseService):
         async with session_maker() as session:
             unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
             single_unlink_responses: list[SingleUnlinkResponse] = []
-            mappings_to_delete = []
             for single_unlink_request in unlinkRequest.unlink_request:
                 try:
                     await IdFaMappingValidations.get_component().validate_unlink_request(
                         connection=session, single_unlink_request=single_unlink_request
                     )
-                    print(
-                        single_unlink_request,
-                    )
-                    mappings_to_delete.append(
-                        self.unlink_id_fa_mapping(single_unlink_request)
+                    await session.execute(
+                        delete(IdFaMapping).where(
+                            IdFaMapping.id_value == single_unlink_request.id
+                        )
                     )
                     single_unlink_responses.append(
                         self.construct_single_unlink_response_for_success(
@@ -392,22 +388,12 @@ class MapperService(BaseService):
                         )
                     )
                 except UnlinkValidationException as e:
-                    UnlinkValidationException(
-                        message=" ID doesn't exist",
-                        status=StatusEnum.rjct,
-                        validation_error_type=UnlinkStatusReasonCode.rjct_reference_id_invalid,
-                    )
                     single_unlink_responses.append(
                         self.construct_single_unlink_response_for_failure(
                             single_unlink_request, e
                         )
                     )
-                if mappings_to_delete:
-                    session.delete(*mappings_to_delete)
-                    await session.commit()
-                else:
-                    print("No objects to delete")
-        await session.commit()
+            await session.commit()
         return single_unlink_responses
 
     def unlink_id_fa_mapping(self, single_unlink_request):
