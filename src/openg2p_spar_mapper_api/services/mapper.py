@@ -3,27 +3,26 @@ from datetime import datetime
 
 from openg2p_fastapi_common.context import dbengine
 from openg2p_fastapi_common.service import BaseService
-from openg2p_g2pconnect_common_lib.common.schemas import Request, StatusEnum
+from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkRequest,
+    LinkRequestMessage,
     LinkStatusReasonCode,
     ResolveRequest,
-    SingleLinkResponse,
-    SingleResolveResponse,
-    SingleUnlinkResponse,
-    SingleUpdateResponse,
-    UnlinkRequest,
-    UpdateRequest,
-    UpdateStatusReasonCode,
-)
-from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
+    ResolveRequestMessage,
     ResolveScope,
     ResolveStatusReasonCode,
+    SingleLinkResponse,
     SingleResolveRequest,
-)
-from openg2p_g2pconnect_common_lib.mapper.schemas.update import (
-    AdditionalInfo,
+    SingleResolveResponse,
+    SingleUnlinkResponse,
     SingleUpdateRequest,
+    SingleUpdateResponse,
+    UnlinkRequest,
+    UnlinkRequestMessage,
+    UpdateRequest,
+    UpdateRequestMessage,
+    UpdateStatusReasonCode,
 )
 from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -43,14 +42,14 @@ _logger = logging.getLogger(_config.logging_default_logger_name)
 
 
 class MapperService(BaseService):
-    async def link(self, request: Request):
+    async def link(self, link_request: LinkRequest):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
-            linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
+            link_request_message: LinkRequestMessage = link_request.message
             mappings_to_add = []
             single_link_responses: list[SingleLinkResponse] = []
 
-            for single_link_request in linkRequest.link_request:
+            for single_link_request in link_request_message.link_request:
                 try:
                     await IdFaMappingValidations.get_component().validate_link_request(
                         connection=session, single_link_request=single_link_request
@@ -113,19 +112,16 @@ class MapperService(BaseService):
             locale=single_link_request.locale,
         )
 
-    async def update(self, request: Request):
+    async def update(self, update_request: UpdateRequest):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
-            updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
+            update_request_message: UpdateRequestMessage = update_request.message
             single_update_responses: list[SingleUpdateResponse] = []
 
-            for single_update_request in updateRequest.update_request:
+            for single_update_request in update_request_message.update_request:
                 try:
                     await IdFaMappingValidations.get_component().validate_update_request(
                         connection=session, single_update_request=single_update_request
-                    )
-                    single_update_request: SingleUpdateRequest = (
-                        SingleUpdateRequest.model_validate(single_update_request)
                     )
 
                     single_update_responses.append(
@@ -175,14 +171,6 @@ class MapperService(BaseService):
                 addl_info_copy = (
                     result.additional_info.copy() if result.additional_info else []
                 )
-                [info["name"] for info in addl_info_copy]
-                # for info in single_update_request.additional_info:
-                #     if info["name"] in addl_info_keys:
-                #         addl_info_copy[
-                #             addl_info_keys.index(info["name"])
-                #         ] = info.model_dump()
-                #     else:
-                #         addl_info_copy.append(info.model_dump())
                 result.additional_info = addl_info_copy
         else:
             single_response.status = StatusEnum.rjct
@@ -218,15 +206,14 @@ class MapperService(BaseService):
             locale=single_update_request.locale,
         )
 
-    async def resolve(self, request: Request):
+    async def resolve(self, resolve_request: ResolveRequest):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
-            resolveRequest: ResolveRequest = ResolveRequest.model_validate(
-                request.message
-            )
+            resolve_request_message: ResolveRequestMessage = resolve_request.message
+
             single_resolve_responses: list[SingleResolveResponse] = []
 
-            for single_resolve_request in resolveRequest.resolve_request:
+            for single_resolve_request in resolve_request_message.resolve_request:
                 try:
                     await IdFaMappingValidations.get_component().validate_resolve_request(
                         connection=session,
@@ -238,11 +225,13 @@ class MapperService(BaseService):
                     stmt, result = await self.construct_query(
                         session, single_resolve_request
                     )
-                    self.construct_single_resolve(single_resolve_request, result)
+                    single_resolve_response = self.construct_single_resolve(
+                        single_resolve_request, result
+                    )
 
                     single_resolve_responses.append(
                         self.construct_single_resolve_response_for_success(
-                            single_resolve_request
+                            single_resolve_response
                         )
                     )
                 except ResolveValidationException as e:
@@ -254,36 +243,31 @@ class MapperService(BaseService):
         await session.commit()
         return single_resolve_responses
 
-    def construct_single_resolve(self, single_resolve_request, result):
+    def construct_single_resolve(
+        self, single_resolve_request, result
+    ) -> SingleResolveResponse:
         single_response = self.construct_single_resolve_response_for_success(
             single_resolve_request
         )
         if result:
+            single_response.status = StatusEnum.succ
             if single_resolve_request.scope == ResolveScope.details:
                 single_response.fa = result.fa_value
                 single_response.id = result.id_value
                 single_response.additional_info = (
-                    [
-                        AdditionalInfo.model_validate(info)
-                        for info in result.additional_info
-                    ]
-                    if result.additional_info
-                    else None
+                    list(result.additional_info) if result.additional_info else None
                 )
             elif single_resolve_request.scope == ResolveScope.yes_no:
                 pass
             if single_resolve_request.fa and not single_resolve_request.id:
-                single_response.status = StatusEnum.succ
                 single_response.status_reason_code = (
                     ResolveStatusReasonCode.succ_fa_active
                 )
             else:
-                single_response.status = StatusEnum.succ
                 single_response.status_reason_code = (
                     ResolveStatusReasonCode.succ_id_active
                 )
         else:
-            single_response.status = StatusEnum.succ
             if single_resolve_request.id and single_resolve_request.fa:
                 single_response.status_reason_code = (
                     ResolveStatusReasonCode.succ_fa_not_linked_to_id
@@ -305,11 +289,10 @@ class MapperService(BaseService):
                 single_response.status_reason_message = (
                     "Mapping not found against given ID."
                 )
+        return single_response
 
     async def construct_query(self, session, single_resolve_request):
-        single_response = self.construct_single_resolve_response_for_success(
-            single_resolve_request
-        )
+        self.construct_single_resolve_response_for_success(single_resolve_request)
         stmt = None
         id_query = IdFaMapping.id_value == single_resolve_request.id
         fa_query = IdFaMapping.fa_value == single_resolve_request.fa
@@ -332,10 +315,7 @@ class MapperService(BaseService):
             stmt = select(IdFaMapping).where(id_query)
         elif single_resolve_request.fa:
             stmt = select(IdFaMapping).where(fa_query)
-        else:
-            single_response.status = StatusEnum.rjct
-            single_response.status_reason_code = ResolveStatusReasonCode.rjct_id_invalid
-            single_response.status_reason_message = "Neither ID (nor FA) is given."
+
         result = await session.execute(stmt)
         result = result.scalar()
         return stmt, result
@@ -360,19 +340,19 @@ class MapperService(BaseService):
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
             fa=single_resolve_request.fa,
-            status=StatusEnum.rjct,
+            status=error.status,
             status_reason_code=error.validation_error_type,
             status_reason_message=error.message,
             additional_info=None,
             locale=single_resolve_request.locale,
         )
 
-    async def unlink(self, request: Request):
+    async def unlink(self, unlink_request: UnlinkRequest):
         session_maker = async_sessionmaker(dbengine.get(), expire_on_commit=False)
         async with session_maker() as session:
-            unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
+            unlink_request_message: UnlinkRequestMessage = unlink_request.message
             single_unlink_responses: list[SingleUnlinkResponse] = []
-            for single_unlink_request in unlinkRequest.unlink_request:
+            for single_unlink_request in unlink_request_message.unlink_request:
                 try:
                     await IdFaMappingValidations.get_component().validate_unlink_request(
                         connection=session, single_unlink_request=single_unlink_request

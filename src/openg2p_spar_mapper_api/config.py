@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     """
     openapi_version: str = __version__
 
-    db_dbname: str = "mapper-db"
+    db_dbname: str = "openg2p_spar_db"
 
     default_callback_url: Optional[AnyUrl] = None
     default_callback_timeout: int = 10
