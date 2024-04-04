@@ -14,13 +14,13 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/g2pconnect/mapper/sync/link": {
+    "/mapper/sync/link": {
       "post": {
         "tags": [
           "G2PConnect Mapper Sync"
         ],
         "summary": "Link Sync",
-        "operationId": "link_sync_g2pconnect_mapper_sync_link_post",
+        "operationId": "link_sync_mapper_sync_link_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -95,13 +95,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/sync/update": {
+    "/mapper/sync/update": {
       "post": {
         "tags": [
           "G2PConnect Mapper Sync"
         ],
         "summary": "Update Sync",
-        "operationId": "update_sync_g2pconnect_mapper_sync_update_post",
+        "operationId": "update_sync_mapper_sync_update_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -176,13 +176,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/sync/resolve": {
+    "/mapper/sync/resolve": {
       "post": {
         "tags": [
           "G2PConnect Mapper Sync"
         ],
         "summary": "Resolve Sync",
-        "operationId": "resolve_sync_g2pconnect_mapper_sync_resolve_post",
+        "operationId": "resolve_sync_mapper_sync_resolve_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -257,13 +257,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/sync/unlink": {
+    "/mapper/sync/unlink": {
       "post": {
         "tags": [
           "G2PConnect Mapper Sync"
         ],
         "summary": "Unlink Sync",
-        "operationId": "unlink_sync_g2pconnect_mapper_sync_unlink_post",
+        "operationId": "unlink_sync_mapper_sync_unlink_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -338,13 +338,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/async/link": {
+    "/mapper/async/link": {
       "post": {
         "tags": [
           "G2PConnect Mapper Async"
         ],
         "summary": "Link Async",
-        "operationId": "link_async_g2pconnect_mapper_async_link_post",
+        "operationId": "link_async_mapper_async_link_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -419,13 +419,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/async/update": {
+    "/mapper/async/update": {
       "post": {
         "tags": [
           "G2PConnect Mapper Async"
         ],
         "summary": "Update Async",
-        "operationId": "update_async_g2pconnect_mapper_async_update_post",
+        "operationId": "update_async_mapper_async_update_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -500,13 +500,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/async/resolve": {
+    "/mapper/async/resolve": {
       "post": {
         "tags": [
           "G2PConnect Mapper Async"
         ],
         "summary": "Resolve Async",
-        "operationId": "resolve_async_g2pconnect_mapper_async_resolve_post",
+        "operationId": "resolve_async_mapper_async_resolve_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -581,13 +581,13 @@
         }
       }
     },
-    "/g2pconnect/mapper/async/unlink": {
+    "/mapper/async/unlink": {
       "post": {
         "tags": [
           "G2PConnect Mapper Async"
         ],
         "summary": "Unlink Async",
-        "operationId": "unlink_async_g2pconnect_mapper_async_unlink_post",
+        "operationId": "unlink_async_mapper_async_unlink_post",
         "requestBody": {
           "content": {
             "application/json": {
