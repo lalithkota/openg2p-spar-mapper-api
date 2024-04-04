@@ -10,6 +10,10 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     SingleLinkResponse,
     SingleUpdateResponse,
     SingleResolveResponse,
+    LinkResponse,
+    UnlinkResponse,
+    ResolveResponse,
+    UpdateResponse,
 )
 from ..services import (
     MapperService,
@@ -31,25 +35,25 @@ class SyncMapperController(BaseController):
         self.router.add_api_route(
             "/link",
             self.link_sync,
-            responses={200: {"model": SyncResponse}},
+            responses={200: {"model": LinkResponse}},
             methods=["POST"],
         )
         self.router.add_api_route(
             "/update",
             self.update_sync,
-            responses={200: {"model": SyncResponse}},
+            responses={200: {"model": UpdateResponse}},
             methods=["POST"],
         )
         self.router.add_api_route(
             "/resolve",
             self.resolve_sync,
-            responses={200: {"model": SyncResponse}},
+            responses={200: {"model": ResolveResponse}},
             methods=["POST"],
         )
         self.router.add_api_route(
             "/unlink",
             self.unlink_sync,
-            responses={200: {"model": SyncResponse}},
+            responses={200: {"model": UnlinkResponse}},
             methods=["POST"],
         )
 

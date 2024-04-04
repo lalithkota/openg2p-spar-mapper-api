@@ -29,6 +29,10 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkRequestMessage,
     UpdateRequestMessage,
     UnlinkRequestMessage,
+    LinkResponseMessage,
+    UnlinkResponseMessage,
+    UpdateResponseMessage,
+    ResolveResponseMessage,
 )
 
 from .exceptions import (
@@ -41,22 +45,22 @@ class SyncResponseHelper(BaseService):
         self,
         link_request: LinkRequest,
         single_link_responses: list[SingleLinkResponse],
-    ) -> SyncResponse:
+    ) -> LinkResponse:
         link_request_message: LinkRequestMessage = link_request.message
-        linkResponse: LinkResponse = LinkResponse(
+        link_response_message: LinkResponseMessage = LinkResponseMessage(
             transaction_id=link_request_message.transaction_id,
             correlation_id=None,
             link_response=single_link_responses,
         )
-        total_count = len(linkResponse.link_response)
+        total_count = len(link_response_message.link_response)
         completed_count = len(
             [
                 link
-                for link in linkResponse.link_response
+                for link in link_response_message.link_response
                 if link.status == StatusEnum.succ
             ]
         )
-        return SyncResponse(
+        return LinkResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
                 message_id=link_request.header.message_id,
@@ -72,29 +76,29 @@ class SyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=linkResponse,
+            message=link_response_message,
         )
 
     def construct_success_sync_update_response(
         self,
         update_request: UpdateRequest,
         single_update_responses: list[SingleUpdateResponse],
-    ) -> SyncResponse:
+    ) -> UpdateResponse:
         update_request_message: UpdateRequestMessage = update_request.message
-        updateResponse: UpdateResponse = UpdateResponse(
+        update_response_message: UpdateResponseMessage = UpdateResponseMessage(
             transaction_id=update_request_message.transaction_id,
             correlation_id=None,
             update_response=single_update_responses,
         )
-        total_count = len(updateResponse.update_response)
+        total_count = len(update_response_message.update_response)
         completed_count = len(
             [
                 update
-                for update in updateResponse.update_response
+                for update in update_response_message.update_response
                 if update.status == StatusEnum.succ
             ]
         )
-        return SyncResponse(
+        return UpdateResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
                 message_id=update_request.header.message_id,
@@ -110,29 +114,29 @@ class SyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=updateResponse,
+            message=update_response_message,
         )
 
     def construct_success_sync_resolve_response(
         self,
         resolve_request: ResolveRequest,
         single_resolve_responses: list[SingleResolveResponse],
-    ) -> SyncResponse:
+    ) -> ResolveResponse:
         resolve_request_message: ResolveRequestMessage = resolve_request.message
-        resolveResponse: ResolveResponse = ResolveResponse(
+        resolve_response_message: ResolveResponseMessage = ResolveResponseMessage(
             transaction_id=resolve_request_message.transaction_id,
             correlation_id=None,
             resolve_response=single_resolve_responses,
         )
-        total_count = len(resolveResponse.resolve_response)
+        total_count = len(resolve_response_message.resolve_response)
         completed_count = len(
             [
                 resolve
-                for resolve in resolveResponse.resolve_response
+                for resolve in resolve_response_message.resolve_response
                 if resolve.status == StatusEnum.succ
             ]
         )
-        return SyncResponse(
+        return ResolveResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
                 message_id=resolve_request.header.message_id,
@@ -148,29 +152,29 @@ class SyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=resolveResponse,
+            message=resolve_response_message,
         )
 
     def construct_success_sync_unlink_response(
         self,
         unlink_request: UnlinkRequest,
         single_unlink_responses: list[SingleUnlinkResponse],
-    ) -> SyncResponse:
+    ) -> UnlinkResponse:
         unlink_request_message: UnlinkRequestMessage = unlink_request.message
-        unlinkResponse: UnlinkResponse = UnlinkResponse(
+        unlink_response_message: UnlinkResponseMessage = UnlinkResponseMessage(
             transaction_id=unlink_request_message.transaction_id,
             correlation_id=None,
             unlink_response=single_unlink_responses,
         )
-        total_count = len(unlinkResponse.unlink_response)
+        total_count = len(unlink_response_message.unlink_response)
         completed_count = len(
             [
                 unlink
-                for unlink in unlinkResponse.unlink_response
+                for unlink in unlink_response_message.unlink_response
                 if unlink.status == StatusEnum.succ
             ]
         )
-        return SyncResponse(
+        return UnlinkResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
                 message_id=unlink_request.header.message_id,
@@ -186,7 +190,7 @@ class SyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=unlinkResponse,
+            message=unlink_response_message,
         )
 
     def construct_error_sync_response(
@@ -249,7 +253,7 @@ class AsyncResponseHelper(BaseService):
         )
         link_request_message: LinkRequestMessage = link_request.message
 
-        linkResponse: LinkResponse = LinkResponse(
+        link_response_message: LinkResponseMessage = LinkResponseMessage(
             transaction_id=link_request_message.transaction_id,
             correlation_id=None,
             link_response=single_link_responses,
@@ -271,7 +275,7 @@ class AsyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=linkResponse,
+            message=link_response_message,
         )
 
     def construct_success_async_callback_update_request(
@@ -289,7 +293,7 @@ class AsyncResponseHelper(BaseService):
             ]
         )
         update_request_message: UpdateRequestMessage = update_request.message
-        updateResponse: UpdateResponse = UpdateResponse(
+        update_response_message: UpdateResponseMessage = UpdateResponseMessage(
             transaction_id=update_request_message.transaction_id,
             correlation_id=None,
             update_response=single_update_responses,
@@ -311,7 +315,7 @@ class AsyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=updateResponse,
+            message=update_response_message,
         )
 
     def construct_success_async_callback_resolve_request(
@@ -329,7 +333,7 @@ class AsyncResponseHelper(BaseService):
             ]
         )
         resolve_request_message: ResolveRequestMessage = resolve_request.message
-        resolveResponse: ResolveResponse = ResolveResponse(
+        resolve_response_message: ResolveResponseMessage = ResolveResponseMessage(
             transaction_id=resolve_request_message.transaction_id,
             correlation_id=None,
             resolve_response=single_resolve_responses,
@@ -351,7 +355,7 @@ class AsyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=resolveResponse,
+            message=resolve_response_message,
         )
 
     def construct_success_async_callback_unlink_request(
@@ -369,7 +373,7 @@ class AsyncResponseHelper(BaseService):
             ]
         )
         unlink_request_message: UnlinkRequestMessage = unlink_request.message
-        unlinkResponse: UnlinkResponse = UnlinkResponse(
+        unlink_response_message: UnlinkResponseMessage = UnlinkResponseMessage(
             transaction_id=unlink_request_message.transaction_id,
             correlation_id=None,
             unlink_response=single_unlink_responses,
@@ -391,7 +395,7 @@ class AsyncResponseHelper(BaseService):
                 is_msg_encrypted=False,
                 meta={},
             ),
-            message=unlinkResponse,
+            message=unlink_response_message,
         )
 
     def construct_error_async_callback_request(
