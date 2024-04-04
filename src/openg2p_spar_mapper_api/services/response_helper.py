@@ -246,13 +246,11 @@ class AsyncResponseHelper(BaseService):
     def construct_error_async_response(
         self,
         request: Request,
-        correlation_id: str,
         exception: RequestValidationException,
     ) -> AsyncResponse:
         return AsyncResponse(
             message=AsyncResponseMessage(
                 ack_status=AsyncAck.NACK,
-                correlation_id=correlation_id,
                 timestamp=datetime.utcnow(),
                 error={
                     "code": exception.code,
@@ -421,7 +419,6 @@ class AsyncResponseHelper(BaseService):
     def construct_error_async_callback_request(
         self,
         request: Request,
-        correlation_id: str,
         exception: RequestValidationException,
     ) -> AsyncCallbackRequest:
         return AsyncCallbackRequest(
