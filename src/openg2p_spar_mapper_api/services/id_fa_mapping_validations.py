@@ -1,3 +1,4 @@
+from sqlalchemy import and_, select, or_
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
@@ -10,7 +11,6 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     UnlinkStatusReasonCode,
     UpdateStatusReasonCode,
 )
-from sqlalchemy import and_, select
 
 from ..models import IdFaMapping
 from .exceptions import (
@@ -22,9 +22,8 @@ from .exceptions import (
 
 
 class IdFaMappingValidations(BaseService):
-    @staticmethod
     async def validate_link_request(
-        connection, single_link_request: SingleLinkRequest
+        self, connection, single_link_request: SingleLinkRequest
     ) -> None:
         # Check if the ID is null
         if not single_link_request.id:
@@ -62,9 +61,8 @@ class IdFaMappingValidations(BaseService):
 
         return None
 
-    @staticmethod
     async def validate_update_request(
-        connection, single_update_request: SingleUpdateRequest
+        self, connection, single_update_request: SingleUpdateRequest
     ) -> None:
         if not single_update_request.id:
             raise UpdateValidationException(
@@ -98,27 +96,19 @@ class IdFaMappingValidations(BaseService):
 
         return None
 
-    @staticmethod
     async def validate_resolve_request(
-        connection, single_resolve_request: SingleResolveRequest
+        self, connection, single_resolve_request: SingleResolveRequest
     ) -> None:
-        if not single_resolve_request.id:
+        if not single_resolve_request.id and not single_resolve_request.fa:
             raise ResolveValidationException(
-                message="ID is null",
+                message="Either ID or FA are required",
                 status=StatusEnum.rjct,
-                validation_error_type=ResolveStatusReasonCode.rjct_id_invalid,
-            )
-
-        if not single_resolve_request.fa:
-            raise ResolveValidationException(
-                message="FA is null",
-                status=StatusEnum.rjct,
-                validation_error_type=ResolveStatusReasonCode.rjct_fa_invalid,
+                validation_error_type=ResolveStatusReasonCode.rjct_reference_id_invalid,
             )
 
         result = await connection.execute(
             select(IdFaMapping).where(
-                and_(
+                or_(
                     IdFaMapping.id_value == single_resolve_request.id,
                     IdFaMapping.fa_value == single_resolve_request.fa,
                 )
@@ -134,9 +124,8 @@ class IdFaMappingValidations(BaseService):
             )
         return None
 
-    @staticmethod
     async def validate_unlink_request(
-        connection, single_unlink_request: SingleUnlinkRequest
+        self, connection, single_unlink_request: SingleUnlinkRequest
     ) -> None:
         if not single_unlink_request.id:
             raise UnlinkValidationException(

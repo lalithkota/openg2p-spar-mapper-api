@@ -25,6 +25,10 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     UnlinkResponse,
     UpdateRequest,
     UpdateResponse,
+    ResolveRequestMessage,
+    LinkRequestMessage,
+    UpdateRequestMessage,
+    UnlinkRequestMessage,
 )
 
 from .exceptions import (
@@ -33,14 +37,14 @@ from .exceptions import (
 
 
 class SyncResponseHelper(BaseService):
-    @staticmethod
     def construct_success_sync_link_response(
-        request: Request,
+        self,
+        link_request: LinkRequest,
         single_link_responses: list[SingleLinkResponse],
     ) -> SyncResponse:
-        linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
+        link_request_message: LinkRequestMessage = link_request.message
         linkResponse: LinkResponse = LinkResponse(
-            transaction_id=linkRequest.transaction_id,
+            transaction_id=link_request_message.transaction_id,
             correlation_id=None,
             link_response=single_link_responses,
         )
@@ -52,40 +56,33 @@ class SyncResponseHelper(BaseService):
                 if link.status == StatusEnum.succ
             ]
         )
-        # if completed_count == 0:
-        #     raise LinkValidationException(
-        #         message="All requests in transaction failed.",
-        #         status=StatusEnum.rjct,
-        #         validation_error_type=LinkStatusReasonCode.rjct_errors_too_many,
-        #     )
-
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=link_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=link_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=link_request.header.sender_id,
+                receiver_id=link_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
             message=linkResponse,
         )
 
-    @staticmethod
     def construct_success_sync_update_response(
-        request: Request,
+        self,
+        update_request: UpdateRequest,
         single_update_responses: list[SingleUpdateResponse],
     ) -> SyncResponse:
-        updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
+        update_request_message: UpdateRequestMessage = update_request.message
         updateResponse: UpdateResponse = UpdateResponse(
-            transaction_id=updateRequest.transaction_id,
+            transaction_id=update_request_message.transaction_id,
             correlation_id=None,
             update_response=single_update_responses,
         )
@@ -97,39 +94,33 @@ class SyncResponseHelper(BaseService):
                 if update.status == StatusEnum.succ
             ]
         )
-        # if completed_count == 0:
-        #     raise UpdateValidationException(
-        #         message="All requests in transaction failed.",
-        #         status=StatusEnum.rjct,
-        #         validation_error_type=UpdateStatusReasonCode.rjct_errors_too_many,
-        #     )
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=update_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=update_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=update_request.header.sender_id,
+                receiver_id=update_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
             message=updateResponse,
         )
 
-    @staticmethod
     def construct_success_sync_resolve_response(
-        request: Request,
+        self,
+        resolve_request: ResolveRequest,
         single_resolve_responses: list[SingleResolveResponse],
     ) -> SyncResponse:
-        resolveRequest: ResolveRequest = ResolveRequest.model_validate(request.message)
+        resolve_request_message: ResolveRequestMessage = resolve_request.message
         resolveResponse: ResolveResponse = ResolveResponse(
-            transaction_id=resolveRequest.transaction_id,
+            transaction_id=resolve_request_message.transaction_id,
             correlation_id=None,
             resolve_response=single_resolve_responses,
         )
@@ -141,39 +132,33 @@ class SyncResponseHelper(BaseService):
                 if resolve.status == StatusEnum.succ
             ]
         )
-        # if completed_count == 0:
-        #     raise ResolveValidationException(
-        #         message="All requests in transaction failed.",
-        #         status=StatusEnum.rjct,
-        #         validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
-        #     )
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=resolve_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=resolve_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=resolve_request.header.sender_id,
+                receiver_id=resolve_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
             message=resolveResponse,
         )
 
-    @staticmethod
     def construct_success_sync_unlink_response(
-        request: Request,
+        self,
+        unlink_request: UnlinkRequest,
         single_unlink_responses: list[SingleUnlinkResponse],
     ) -> SyncResponse:
-        unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
+        unlink_request_message: UnlinkRequestMessage = unlink_request.message
         unlinkResponse: UnlinkResponse = UnlinkResponse(
-            transaction_id=unlinkRequest.transaction_id,
+            transaction_id=unlink_request_message.transaction_id,
             correlation_id=None,
             unlink_response=single_unlink_responses,
         )
@@ -185,34 +170,27 @@ class SyncResponseHelper(BaseService):
                 if unlink.status == StatusEnum.succ
             ]
         )
-        # if completed_count == 0:
-        #     raise UnlinkValidationException(
-        #         message="All requests in transaction failed.",
-        #         status=StatusEnum.rjct,
-        #         validation_error_type=ResolveStatusReasonCode.rjct_errors_too_many,
-        #     )
         return SyncResponse(
             header=SyncResponseHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=unlink_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=unlink_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=unlink_request.header.sender_id,
+                receiver_id=unlink_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
             message=unlinkResponse,
         )
 
-    @staticmethod
     def construct_error_sync_response(
-        request: Request, exception: RequestValidationException
+        self, request: Request, exception: RequestValidationException
     ) -> SyncResponse:
         return SyncResponse(
             signature=None,
@@ -261,7 +239,7 @@ class AsyncResponseHelper(BaseService):
 
     def construct_success_async_callback_link_request(
         self,
-        request: Request,
+        link_request: LinkRequest,
         correlation_id: str,
         single_link_responses: list[SingleLinkResponse],
     ) -> AsyncCallbackRequest:
@@ -269,10 +247,10 @@ class AsyncResponseHelper(BaseService):
         completed_count = len(
             [link for link in single_link_responses if link.status == StatusEnum.succ]
         )
-        linkRequest: LinkRequest = LinkRequest.model_validate(request.message)
+        link_request_message: LinkRequestMessage = link_request.message
 
         linkResponse: LinkResponse = LinkResponse(
-            transaction_id=linkRequest.transaction_id,
+            transaction_id=link_request_message.transaction_id,
             correlation_id=None,
             link_response=single_link_responses,
         )
@@ -280,16 +258,16 @@ class AsyncResponseHelper(BaseService):
             signature=None,
             header=AsyncCallbackRequestHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=link_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=link_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=link_request.header.sender_id,
+                receiver_id=link_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
@@ -298,7 +276,7 @@ class AsyncResponseHelper(BaseService):
 
     def construct_success_async_callback_update_request(
         self,
-        request: Request,
+        update_request: UpdateRequest,
         correlation_id: str,
         single_update_responses: list[SingleUpdateResponse],
     ) -> AsyncCallbackRequest:
@@ -310,9 +288,9 @@ class AsyncResponseHelper(BaseService):
                 if update.status == StatusEnum.succ
             ]
         )
-        updateRequest: UpdateRequest = UpdateRequest.model_validate(request.message)
+        update_request_message: UpdateRequestMessage = update_request.message
         updateResponse: UpdateResponse = UpdateResponse(
-            transaction_id=updateRequest.transaction_id,
+            transaction_id=update_request_message.transaction_id,
             correlation_id=None,
             update_response=single_update_responses,
         )
@@ -320,16 +298,16 @@ class AsyncResponseHelper(BaseService):
             signature=None,
             header=AsyncCallbackRequestHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=update_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=update_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=update_request.header.sender_id,
+                receiver_id=update_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
@@ -338,7 +316,7 @@ class AsyncResponseHelper(BaseService):
 
     def construct_success_async_callback_resolve_request(
         self,
-        request: Request,
+        resolve_request: ResolveRequest,
         correlation_id: str,
         single_resolve_responses: list[SingleResolveResponse],
     ) -> AsyncCallbackRequest:
@@ -350,9 +328,9 @@ class AsyncResponseHelper(BaseService):
                 if resolve.status == StatusEnum.succ
             ]
         )
-        resolveRequest: ResolveRequest = ResolveRequest.model_validate(request.message)
+        resolve_request_message: ResolveRequestMessage = resolve_request.message
         resolveResponse: ResolveResponse = ResolveResponse(
-            transaction_id=resolveRequest.transaction_id,
+            transaction_id=resolve_request_message.transaction_id,
             correlation_id=None,
             resolve_response=single_resolve_responses,
         )
@@ -360,16 +338,16 @@ class AsyncResponseHelper(BaseService):
             signature=None,
             header=AsyncCallbackRequestHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=resolve_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=resolve_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=resolve_request.header.sender_id,
+                receiver_id=resolve_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
@@ -378,7 +356,7 @@ class AsyncResponseHelper(BaseService):
 
     def construct_success_async_callback_unlink_request(
         self,
-        request: Request,
+        unlink_request: UnlinkRequest,
         correlation_id: str,
         single_unlink_responses: list[SingleUnlinkResponse],
     ) -> AsyncCallbackRequest:
@@ -390,9 +368,9 @@ class AsyncResponseHelper(BaseService):
                 if unlink.status == StatusEnum.succ
             ]
         )
-        unlinkRequest: UnlinkRequest = UnlinkRequest.model_validate(request.message)
+        unlink_request_message: UnlinkRequestMessage = unlink_request.message
         unlinkResponse: UnlinkResponse = UnlinkResponse(
-            transaction_id=unlinkRequest.transaction_id,
+            transaction_id=unlink_request_message.transaction_id,
             correlation_id=None,
             unlink_response=single_unlink_responses,
         )
@@ -400,16 +378,16 @@ class AsyncResponseHelper(BaseService):
             signature=None,
             header=AsyncCallbackRequestHeader(
                 version="1.0.0",
-                message_id=request.header.message_id,
+                message_id=unlink_request.header.message_id,
                 message_ts=datetime.now().isoformat(),
-                action=request.header.action,
+                action=unlink_request.header.action,
                 status=StatusEnum.succ,
                 status_reason_code=None,
                 status_reason_message=None,
                 total_count=total_count,
                 completed_count=completed_count,
-                sender_id=request.header.sender_id,
-                receiver_id=request.header.receiver_id,
+                sender_id=unlink_request.header.sender_id,
+                receiver_id=unlink_request.header.receiver_id,
                 is_msg_encrypted=False,
                 meta={},
             ),
