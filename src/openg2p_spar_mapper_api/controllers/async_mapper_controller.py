@@ -164,7 +164,7 @@ class AsyncMapperController(BaseController):
             single_link_responses: list[
                 SingleLinkResponse
             ] = await self.action_to_method[action](request)
-            
+
             async_call_back_request: (
                 AsyncCallbackRequest
             ) = AsyncResponseHelper.get_component().construct_success_async_callback_link_request(
@@ -177,9 +177,9 @@ class AsyncMapperController(BaseController):
             )
         except RequestValidationException as e:
             _logger.error(f"Error in handle_service_and_callback: {e}")
-            error_response = AsyncResponseHelper.get_component().construct_error_async_callback_request(
+            AsyncResponseHelper.get_component().construct_error_async_callback_request(
                 request, e
-            )     
+            )
             # await self.make_callback(
             #     error_response,
             #     url=request.header.sender_uri,

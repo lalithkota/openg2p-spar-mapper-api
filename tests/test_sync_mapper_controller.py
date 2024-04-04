@@ -5,7 +5,12 @@ from unittest.mock import MagicMock, patch
 
 from fastapi import Request
 from openg2p_g2pconnect_common_lib.common.schemas.status_codes import StatusEnum
-from openg2p_g2pconnect_common_lib.mapper.schemas import SingleLinkResponse ,SingleResolveResponse,SingleUnlinkResponse,SingleUpdateResponse
+from openg2p_g2pconnect_common_lib.mapper.schemas import (
+    SingleLinkResponse,
+    SingleResolveResponse,
+    SingleUnlinkResponse,
+    SingleUpdateResponse,
+)
 from openg2p_spar_mapper_api.controllers.sync_mapper_controller import (
     SyncMapperController,
 )
@@ -75,15 +80,16 @@ class TestSyncMapperController(unittest.TestCase):
         patch.stopall()
 
     def test_link_sync(self):
-        print("Test case test_link_sync is being executed") 
+        print("Test case test_link_sync is being executed")
+
         async def run_test():
             self.mock_link_response.reference_id = "12334324"
-            self.mock_link_response.timestamp = datetime(2024, 4, 4) 
+            self.mock_link_response.timestamp = datetime(2024, 4, 4)
             self.mock_request_validation.validate_request.side_effect = None
             self.mock_request_validation.validate_link_request_header.side_effect = None
 
-            response =  await self.controller.link_sync(self.mock_request)
-            
+            response = await self.controller.link_sync(self.mock_request)
+
             self.mock_mapper_service.link.assert_called_once()
             self.assertIsNotNone(response)
             self.mock_response_helper.get_component().construct_error_sync_response.assert_not_called()
@@ -92,9 +98,10 @@ class TestSyncMapperController(unittest.TestCase):
             )
             self.assertEqual(response.reference_id, "12334324")
             self.assertEqual(response.timestamp, datetime(2024, 4, 4))
-            
+
             # self.assertEqual(response, self.mock_link_response)
             # self.assertEqual(response.timestamp, self.mock_link_response.timestamp)
+
         asyncio.run(run_test())
 
     # def test_update_sync(self):
@@ -137,5 +144,7 @@ class TestSyncMapperController(unittest.TestCase):
     #         )
 
     #         asyncio.run(run_test())
+
+
 if __name__ == "__main__":
     unittest.main()

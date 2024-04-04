@@ -13,7 +13,6 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     SingleUnlinkResponse,
     SingleUpdateResponse,
     UnlinkRequest,
-    UnlinkStatusReasonCode,
     UpdateRequest,
     UpdateStatusReasonCode,
 )
@@ -134,7 +133,6 @@ class MapperService(BaseService):
                             single_update_request
                         )
                     )
-                    
 
                     await self.update_mapping(session, single_update_request)
 
@@ -196,7 +194,7 @@ class MapperService(BaseService):
 
     def construct_single_update_response_for_success(self, single_update_request):
         return SingleUpdateResponse(
-            id= single_update_request.id,
+            id=single_update_request.id,
             reference_id=single_update_request.reference_id,
             timestamp=datetime.now(),
             status=StatusEnum.succ,
@@ -344,7 +342,7 @@ class MapperService(BaseService):
 
     def construct_single_resolve_response_for_success(self, single_resolve_request):
         return SingleResolveResponse(
-            id= single_resolve_request.id,
+            id=single_resolve_request.id,
             reference_id=single_resolve_request.reference_id,
             timestamp=datetime.now(),
             fa=single_resolve_request.fa,
@@ -397,7 +395,6 @@ class MapperService(BaseService):
                     )
             await session.commit()
         return single_unlink_responses
-
 
     def unlink_id_fa_mapping(self, single_unlink_request):
         return IdFaMapping(

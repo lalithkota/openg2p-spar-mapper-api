@@ -2,7 +2,9 @@ from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import (
     SyncResponseStatusReasonCodeEnum,
 )
-from openg2p_g2pconnect_common_lib.common.schemas.async_schemas import AsyncResponseStatusReasonCodeEnum
+from openg2p_g2pconnect_common_lib.common.schemas.async_schemas import (
+    AsyncResponseStatusReasonCodeEnum,
+)
 
 from .exceptions import RequestValidationException
 
