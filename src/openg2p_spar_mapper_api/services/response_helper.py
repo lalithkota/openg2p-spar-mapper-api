@@ -14,25 +14,25 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
 )
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkRequest,
+    LinkRequestMessage,
     LinkResponse,
+    LinkResponseMessage,
     ResolveRequest,
+    ResolveRequestMessage,
     ResolveResponse,
+    ResolveResponseMessage,
     SingleLinkResponse,
     SingleResolveResponse,
     SingleUnlinkResponse,
     SingleUpdateResponse,
     UnlinkRequest,
-    UnlinkResponse,
-    UpdateRequest,
-    UpdateResponse,
-    ResolveRequestMessage,
-    LinkRequestMessage,
-    UpdateRequestMessage,
     UnlinkRequestMessage,
-    LinkResponseMessage,
+    UnlinkResponse,
     UnlinkResponseMessage,
+    UpdateRequest,
+    UpdateRequestMessage,
+    UpdateResponse,
     UpdateResponseMessage,
-    ResolveResponseMessage,
 )
 
 from .exceptions import (

@@ -1,4 +1,3 @@
-from sqlalchemy import and_, select, or_
 from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
@@ -11,6 +10,7 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     UnlinkStatusReasonCode,
     UpdateStatusReasonCode,
 )
+from sqlalchemy import and_, or_, select
 
 from ..models import IdFaMapping
 from .exceptions import (

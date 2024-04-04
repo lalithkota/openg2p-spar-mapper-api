@@ -6,25 +6,24 @@ from openg2p_fastapi_common.service import BaseService
 from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkRequest,
+    LinkRequestMessage,
     LinkStatusReasonCode,
     ResolveRequest,
-    SingleLinkResponse,
-    SingleResolveResponse,
-    SingleUnlinkResponse,
-    SingleUpdateResponse,
-    UnlinkRequest,
-    UpdateRequest,
-    UpdateStatusReasonCode,
-    LinkRequestMessage,
-    UpdateRequestMessage,
     ResolveRequestMessage,
-    UnlinkRequestMessage,
     ResolveScope,
     ResolveStatusReasonCode,
+    SingleLinkResponse,
     SingleResolveRequest,
+    SingleResolveResponse,
+    SingleUnlinkResponse,
     SingleUpdateRequest,
+    SingleUpdateResponse,
+    UnlinkRequest,
+    UnlinkRequestMessage,
+    UpdateRequest,
+    UpdateRequestMessage,
+    UpdateStatusReasonCode,
 )
-
 from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -256,9 +255,7 @@ class MapperService(BaseService):
                 single_response.fa = result.fa_value
                 single_response.id = result.id_value
                 single_response.additional_info = (
-                    [info for info in result.additional_info]
-                    if result.additional_info
-                    else None
+                    list(result.additional_info) if result.additional_info else None
                 )
             elif single_resolve_request.scope == ResolveScope.yes_no:
                 pass
@@ -295,9 +292,7 @@ class MapperService(BaseService):
         return single_response
 
     async def construct_query(self, session, single_resolve_request):
-        single_response = self.construct_single_resolve_response_for_success(
-            single_resolve_request
-        )
+        self.construct_single_resolve_response_for_success(single_resolve_request)
         stmt = None
         id_query = IdFaMapping.id_value == single_resolve_request.id
         fa_query = IdFaMapping.fa_value == single_resolve_request.fa
