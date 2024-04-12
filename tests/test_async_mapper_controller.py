@@ -1,17 +1,21 @@
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
-
+import asyncio
 import pytest
 from openg2p_g2pconnect_common_lib.common.schemas import (
     AsyncAck,
     AsyncResponse,
     AsyncResponseMessage,
     RequestHeader,
+    StatusEnum,
+    AsyncCallbackRequest,
+    AsyncCallbackRequestHeader,
 )
 from openg2p_g2pconnect_common_lib.mapper.schemas import (
     LinkRequest,
     LinkRequestMessage,
     SingleLinkRequest,
+    SingleLinkResponse,
 )
 from openg2p_spar_mapper_api.controllers.async_mapper_controller import (
     AsyncMapperController,
@@ -90,3 +94,79 @@ async def test_link_async(
     assert actual_response.message.correlation_id == "1234"
     assert actual_response.message.ack_status == AsyncAck.ACK
     assert actual_response.message.timestamp == expected_response.message.timestamp
+
+
+@pytest.mark.asyncio
+@patch(
+    "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper.get_component"
+)
+@patch(
+    "openg2p_spar_mapper_api.controllers.async_mapper_controller.RequestValidation.get_component"
+)
+@patch(
+    "openg2p_spar_mapper_api.controllers.async_mapper_controller.MapperService.get_component"
+)
+async def test_handle_service_and_link_callback(
+    mock_mapper_service_get_component,
+    mock_request_validation_get_component,
+    mock_async_response_helper_get_component,
+):
+    mock_mapper_service_instance = AsyncMock()
+    mock_mapper_service_get_component.return_value = mock_mapper_service_instance
+    single_link_responses = [
+        SingleLinkResponse(
+            reference_id="test_ref",
+            timestamp=datetime.utcnow(),
+            status=StatusEnum.succ,
+            locale="en",
+        )
+    ]
+    mock_mapper_service_instance.link.return_value = single_link_responses
+
+    mock_request_validation_instance = AsyncMock()
+    mock_request_validation_get_component.return_value = (
+        mock_request_validation_instance
+    )
+    mock_async_response_helper_instance = AsyncMock()
+    mock_async_response_helper_get_component.return_value = (
+        mock_async_response_helper_instance
+    )
+
+    controller = AsyncMapperController()
+
+    link_request = LinkRequest(
+        header=RequestHeader(
+            message_id="test_message_id",
+            message_ts=datetime.utcnow().isoformat(),
+            action="link",
+            sender_id="test_sender",
+            total_count=1,
+        ),
+        message=LinkRequestMessage(
+            transaction_id="test_transaction_id",
+            link_request=[
+                SingleLinkRequest(
+                    reference_id="test_ref",
+                    timestamp=datetime.utcnow(),
+                    id="test_id",
+                    fa="test_fa",
+                )
+            ],
+        ),
+    )
+
+    # Simulate the behavior without actual execution
+    await controller.handle_service_and_link_callback(
+        link_request, "correlation_id", "link"
+    )
+
+    mock_async_response_helper_instance.construct_success_async_callback_link_request.assert_called_once_with(
+        link_request, "correlation_id", single_link_responses
+    )
+
+    callback_args = (
+        mock_async_response_helper_instance.construct_success_async_callback_link_request.call_args
+    )
+    assert callback_args[0][0] == link_request
+    assert callback_args[0][1] == "correlation_id"
+    assert callback_args[0][2] == single_link_responses
