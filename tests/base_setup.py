@@ -4,4 +4,4 @@ _config = Settings.get_config()
 
 
 def base_setup():
-    _config.db_dbname = "sparuidb"
+    _config.db_dbname = "openg2p_spar_test_db"
