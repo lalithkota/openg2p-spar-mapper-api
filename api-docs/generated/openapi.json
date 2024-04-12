@@ -1979,8 +1979,7 @@
           "message_id",
           "message_ts",
           "action",
-          "status",
-          "status_reason_code"
+          "status"
         ],
         "title": "SyncResponseHeader"
       },
