@@ -1,71 +1,147 @@
-import asyncio
-import unittest
-from unittest.mock import MagicMock, patch
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from fastapi import Request
+import pytest
+from openg2p_g2pconnect_common_lib.common.schemas import (
+    RequestHeader,
+    StatusEnum,
+    SyncResponseHeader,
+    AsyncResponseStatusReasonCodeEnum,
+)
+from openg2p_g2pconnect_common_lib.mapper.schemas import (
+    LinkRequest,
+    LinkRequestMessage,
+    LinkResponse,
+    LinkResponseMessage,
+    SingleLinkRequest,
+    SingleLinkResponse,
+)
 from openg2p_spar_mapper_api.controllers.async_mapper_controller import (
     AsyncMapperController,
 )
+from openg2p_spar_mapper_api.services import (
+    RequestValidation,
+    RequestValidationException,
+)
 
 
-class TestAsyncMapperController(unittest.TestCase):
-    def setUp(self) -> None:
-        self.mock_request = MagicMock(spec=Request)
-        self.mock_request_validation = patch(
-            "openg2p_spar_mapper_api.controllers.async_mapper_controller.RequestValidation"
-        ).start()
-        self.mock_response_helper = patch(
-            "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper"
-        ).start()
+@pytest.fixture(autouse=True)
+def setup_controller():
+    controller = SyncMapperController()
+    controller.mapper_service = AsyncMock()
 
-        self.mock_request_validation.validate_request.side_effect = None
-        self.mock_request_validation.validate_link_request_header.side_effect = None
+    request_validation_mock = MagicMock()
+    request_validation_mock.validate_request = MagicMock(return_value=True)
+    request_validation_mock.validate_link_request_header = MagicMock(return_value=True)
 
-        self.mock_mapper_service = MagicMock()
-        self.controller = AsyncMapperController()
+    mock_link_response = LinkResponse(
+        header=SyncResponseHeader(
+            message_id="test_message_id",
+            message_ts=datetime.now().isoformat(),
+            action="link",
+            status=StatusEnum.succ,
+            status_reason_code=None,
+            status_reason_message="Success",
+        ),
+        message=LinkResponseMessage(
+            transaction_id="trans_id",
+            link_response=[
+                SingleLinkResponse(
+                    reference_id="test_ref",
+                    timestamp=datetime.now(),
+                    status=StatusEnum.succ,
+                    additional_info=[{}],
+                    fa="test_fa",
+                    status_reason_code=None,
+                    status_reason_message="Test message",
+                    locale="en",
+                )
+            ],
+        ),
+    )
 
-    def tearDown(self) -> None:
-        patch.stopall()
+    response_helper_mock = MagicMock()
+    response_helper_mock.construct_success_sync_link_response.return_value = (
+        mock_link_response
+    )
 
-    def test_link_async(self):
-        async def run_test():
-            response = await self.controller.link_async(self.mock_request)
-            self.assertIsNotNone(response)
-            # self.mock_response_helper.get_component().construct_error_async_response.assert_not_called()
-            self.mock_response_helper.get_component().construct_success_async_response.assert_called_once_with(
-                self.mock_request, 123555
-            )
+    mock_error_response = LinkResponse(
+        header=SyncResponseHeader(
+            message_id="error_message_id",
+            message_ts=datetime.now().isoformat(),
+            action="error_action",
+            status=StatusEnum.rjct,
+            status_reason_code=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported.value,
+            status_reason_message="Validation error",
+        ),
+        message=LinkResponseMessage(
+            transaction_id="error_trans_id",
+            link_response=[],
+        ),
+    )
 
-            asyncio.run(run_test())
+    # Mock SyncResponseHelper for error scenario
+    response_helper_mock.construct_error_sync_response.return_value = (
+        mock_error_response
+    )
 
-    # def test_update_sync(self):
-    #     async def run_test():
-    #         response = await self.controller.update_async(self.mock_request)
-    #         self.assertIsNotNone(response)
-    #         # self.mock_response_helper.get_component().construct_error_async_response.assert_not_called()
-    #         self.mock_response_helper.get_component().construct_success_async_response.assert_called_once_with(
-    #             self.mock_request, 123555
-    #         )
+    with patch(
+        "openg2p_spar_mapper_api.services.RequestValidation.get_component",
+        return_value=request_validation_mock,
+    ), patch(
+        "openg2p_spar_mapper_api.services.SyncResponseHelper.get_component",
+        return_value=response_helper_mock,
+    ):
+        mock_link_request = LinkRequest(
+            header=RequestHeader(
+                message_id="test_message_id",
+                message_ts=datetime.now().isoformat(),
+                action="test_action",
+                sender_id="test_sender",
+                total_count=1,
+            ),
+            message=LinkRequestMessage(
+                transaction_id="test_transaction_id",
+                link_request=[
+                    SingleLinkRequest(
+                        reference_id="test_ref",
+                        timestamp=datetime.now(),
+                        id="test_id",
+                        fa="test_fa",
+                    )
+                ],
+            ),
+        )
+        yield controller, mock_link_request
 
-    #         asyncio.run(run_test())
 
-    # def test_resolve_sync(self):
-    #     async def run_test():
-    #         response = await self.controller.resolve_async(self.mock_request)
-    #         self.assertIsNotNone(response)
-    #         # self.mock_response_helper.get_component().construct_error_async_response.assert_not_called()
-    #         self.mock_response_helper.get_component().construct_success_async_response.assert_called_once_with(
-    #             self.mock_request, 123555
-    #         )
-    #         asyncio.run(run_test())
+@pytest.mark.asyncio
+async def test_link_sync_success(setup_controller):
+    controller, mock_link_request = setup_controller
+    assert controller is not None
+    response = await controller.link_sync(mock_link_request)
+    assert response.header.status == StatusEnum.succ
+    assert response.message.transaction_id == "trans_id"
+    controller.mapper_service.link.assert_called_once_with(mock_link_request)
 
-    # def test_unlink_sync(self):
-    #     async def run_test():
-    #         response = await self.controller.unlink_async(self.mock_request)
-    #         self.assertIsNotNone(response)
-    #         # self.mock_response_helper.get_component().construct_error_async_response.assert_not_called()
-    #         self.mock_response_helper.get_component().construct_success_async_response.assert_called_once_with(
-    #             self.mock_request,123555
-    #         )
 
-    #         asyncio.run(run_test())
+@pytest.mark.asyncio
+async def test_link_sync_validation_error(setup_controller):
+    controller, mock_link_request = setup_controller
+    validation_error = RequestValidationException(
+        code=SyncResponseStatusReasonCodeEnum.rjct_action_not_supported,
+        message="Validation error",
+    )
+    with patch.object(
+        RequestValidation.get_component(),
+        "validate_request",
+        side_effect=validation_error,
+    ), patch.object(
+        RequestValidation.get_component(),
+        "validate_link_request_header",
+        side_effect=validation_error,
+    ):
+        response = await controller.link_sync(mock_link_request)
+        assert response.header.status == StatusEnum.rjct
+        assert validation_error.message in response.header.status_reason_message
+        controller.mapper_service.link.assert_not_called()
