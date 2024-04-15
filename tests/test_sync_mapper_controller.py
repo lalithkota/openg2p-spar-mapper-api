@@ -2,13 +2,13 @@ from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from openg2p_g2pconnect_common_lib.common.schemas import (
+from openg2p_g2pconnect_common_lib.schemas import (
     RequestHeader,
     StatusEnum,
     SyncResponseHeader,
     SyncResponseStatusReasonCodeEnum,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas import (
+from openg2p_g2pconnect_mapper_lib.schemas import (
     LinkRequest,
     LinkRequestMessage,
     LinkResponse,
@@ -16,7 +16,7 @@ from openg2p_g2pconnect_common_lib.mapper.schemas import (
     SingleLinkRequest,
     SingleLinkResponse,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
+from openg2p_g2pconnect_mapper_lib.schemas.resolve import (
     ResolveRequest,
     ResolveRequestMessage,
     ResolveResponse,
@@ -24,7 +24,7 @@ from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import (
     SingleResolveRequest,
     SingleResolveResponse,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas.unlink import (
+from openg2p_g2pconnect_mapper_lib.schemas.unlink import (
     SingleUnlinkRequest,
     SingleUnlinkResponse,
     UnlinkRequest,
@@ -32,7 +32,7 @@ from openg2p_g2pconnect_common_lib.mapper.schemas.unlink import (
     UnlinkResponse,
     UnlinkResponseMessage,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas.update import (
+from openg2p_g2pconnect_mapper_lib.schemas.update import (
     SingleUpdateRequest,
     SingleUpdateResponse,
     UpdateRequest,

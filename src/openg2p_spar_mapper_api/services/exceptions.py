@@ -1,5 +1,5 @@
-from openg2p_g2pconnect_common_lib.common.schemas import StatusEnum
-from openg2p_g2pconnect_common_lib.mapper.schemas import (
+from openg2p_g2pconnect_common_lib.schemas import StatusEnum
+from openg2p_g2pconnect_mapper_lib.schemas import (
     LinkStatusReasonCode,
     ResolveStatusReasonCode,
     UnlinkStatusReasonCode,

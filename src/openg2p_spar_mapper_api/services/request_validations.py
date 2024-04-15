@@ -1,8 +1,8 @@
 from openg2p_fastapi_common.service import BaseService
-from openg2p_g2pconnect_common_lib.common.schemas import (
+from openg2p_g2pconnect_common_lib.schemas import (
     SyncResponseStatusReasonCodeEnum,
 )
-from openg2p_g2pconnect_common_lib.common.schemas.async_schemas import (
+from openg2p_g2pconnect_common_lib.schemas.async_schemas import (
     AsyncResponseStatusReasonCodeEnum,
 )
 

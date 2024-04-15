@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from openg2p_fastapi_common.service import BaseService
-from openg2p_g2pconnect_common_lib.common.schemas import (
+from openg2p_g2pconnect_common_lib.schemas import (
     AsyncAck,
     AsyncCallbackRequest,
     AsyncCallbackRequestHeader,
@@ -12,7 +12,7 @@ from openg2p_g2pconnect_common_lib.common.schemas import (
     SyncResponse,
     SyncResponseHeader,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas import (
+from openg2p_g2pconnect_mapper_lib.schemas import (
     LinkRequest,
     LinkRequestMessage,
     LinkResponse,
