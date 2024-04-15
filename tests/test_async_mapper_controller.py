@@ -1,22 +1,40 @@
+import asyncio
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from openg2p_g2pconnect_common_lib.mapper.schemas.resolve import ResolveRequest, ResolveRequestMessage, ResolveResponse, ResolveResponseMessage, SingleResolveRequest, SingleResolveResponse
-from openg2p_g2pconnect_common_lib.mapper.schemas.unlink import SingleUnlinkRequest, SingleUnlinkResponse, UnlinkRequest, UnlinkRequestMessage, UnlinkResponse, UnlinkResponseMessage
-from openg2p_g2pconnect_common_lib.mapper.schemas.update import SingleUpdateRequest, SingleUpdateResponse, UpdateRequest, UpdateRequestMessage, UpdateResponse, UpdateResponseMessage
 import pytest
-from openg2p_g2pconnect_common_lib.common.schemas import (
+from openg2p_g2pconnect_common_lib.schemas import (
     AsyncAck,
+    AsyncCallbackRequest,
+    AsyncCallbackRequestHeader,
     AsyncResponse,
     AsyncResponseMessage,
     RequestHeader,
     StatusEnum,
 )
-from openg2p_g2pconnect_common_lib.mapper.schemas import (
+from openg2p_g2pconnect_mapper_lib.schemas import (
     LinkRequest,
     LinkRequestMessage,
     SingleLinkRequest,
     SingleLinkResponse,
+)
+from openg2p_g2pconnect_mapper_lib.schemas.resolve import (
+    ResolveRequest,
+    ResolveRequestMessage,
+    SingleResolveRequest,
+    SingleResolveResponse,
+)
+from openg2p_g2pconnect_mapper_lib.schemas.unlink import (
+    SingleUnlinkRequest,
+    SingleUnlinkResponse,
+    UnlinkRequest,
+    UnlinkRequestMessage,
+)
+from openg2p_g2pconnect_mapper_lib.schemas.update import (
+    SingleUpdateRequest,
+    SingleUpdateResponse,
+    UpdateRequest,
+    UpdateRequestMessage,
 )
 from openg2p_spar_mapper_api.controllers.async_mapper_controller import (
     AsyncMapperController,
@@ -172,6 +190,7 @@ async def test_handle_service_and_link_callback(
     assert callback_args[0][1] == "correlation_id"
     assert callback_args[0][2] == single_link_responses
 
+
 @pytest.mark.asyncio
 @patch(
     "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper.get_component"
@@ -188,9 +207,7 @@ async def test_update_async(
     mock_async_response_helper_get_component,
 ):
     mock_mapper_service_instance = MagicMock()
-    mock_mapper_service_instance.update = (
-        AsyncMock()
-    )  
+    mock_mapper_service_instance.update = AsyncMock()
     mock_request_validation_instance = MagicMock()
     mock_mapper_service_get_component.return_value = mock_mapper_service_instance
     mock_request_validation_get_component.return_value = (
@@ -241,6 +258,8 @@ async def test_update_async(
     assert actual_response.message.correlation_id == "1234"
     assert actual_response.message.ack_status == AsyncAck.ACK
     assert actual_response.message.timestamp == expected_response.message.timestamp
+
+
 @pytest.mark.asyncio
 @patch(
     "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper.get_component"
@@ -315,8 +334,6 @@ async def test_handle_service_and_update_callback(
     assert callback_args[0][2] == single_update_responses
 
 
-
-
 @pytest.mark.asyncio
 @patch(
     "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper.get_component"
@@ -333,9 +350,7 @@ async def test_resolve_async(
     mock_async_response_helper_get_component,
 ):
     mock_mapper_service_instance = MagicMock()
-    mock_mapper_service_instance.resolve = (
-        AsyncMock()
-    )  
+    mock_mapper_service_instance.resolve = AsyncMock()
     mock_request_validation_instance = MagicMock()
     mock_mapper_service_get_component.return_value = mock_mapper_service_instance
     mock_request_validation_get_component.return_value = (
@@ -386,6 +401,8 @@ async def test_resolve_async(
     assert actual_response.message.correlation_id == "1234"
     assert actual_response.message.ack_status == AsyncAck.ACK
     assert actual_response.message.timestamp == expected_response.message.timestamp
+
+
 @pytest.mark.asyncio
 @patch(
     "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper.get_component"
@@ -460,8 +477,6 @@ async def test_handle_service_and_resolve_callback(
     assert callback_args[0][2] == single_resolve_responses
 
 
-
-
 @pytest.mark.asyncio
 @patch(
     "openg2p_spar_mapper_api.controllers.async_mapper_controller.AsyncResponseHelper.get_component"
@@ -477,11 +492,8 @@ async def test_unlink_async(
     mock_request_validation_get_component,
     mock_async_response_helper_get_component,
 ):
-    
     mock_mapper_service_instance = MagicMock()
-    mock_mapper_service_instance.unlink = (
-        AsyncMock()
-    )  
+    mock_mapper_service_instance.unlink = AsyncMock()
     mock_request_validation_instance = MagicMock()
     mock_mapper_service_get_component.return_value = mock_mapper_service_instance
     mock_request_validation_get_component.return_value = (
@@ -607,3 +619,43 @@ async def test_handle_service_and_unlink_callback(
     assert callback_args[0][0] == unlink_request
     assert callback_args[0][1] == "correlation_id"
     assert callback_args[0][2] == single_unlink_responses
+
+
+@pytest.mark.asyncio
+async def test_make_callback():
+    async_call_back_request = AsyncCallbackRequest(
+        header=AsyncCallbackRequestHeader(
+            message_id="123",
+            message_ts="2021-05-01T12:00:00Z",
+            action="test_action",
+            status=StatusEnum.succ,
+        ),
+        message={"key": "value"},
+    )
+
+    url = "http://test.com/callback"
+    url_suffix = "/suffix"
+
+    with patch(
+        "openg2p_spar_mapper_api.controllers.async_mapper_controller.httpx.post"
+    ) as mock_post:
+        mock_response = MagicMock()
+        mock_response.raise_for_status.return_value = None
+        mock_post.return_value = mock_response
+
+        task = asyncio.ensure_future(
+            AsyncMapperController.make_callback(
+                async_call_back_request, url, url_suffix
+            )
+        )
+        await task
+        await asyncio.gather(
+            *[t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+        )
+
+        mock_post.assert_called_once_with(
+            f"{url.rstrip('/')}{url_suffix}",
+            headers={"content-type": "application/json"},
+            content=async_call_back_request.model_dump_json(),
+            timeout=10,
+        )

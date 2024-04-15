@@ -1,5 +1,5 @@
 from openg2p_fastapi_common.controller import BaseController
-from openg2p_g2pconnect_common_lib.mapper.schemas import (
+from openg2p_g2pconnect_mapper_lib.schemas import (
     LinkRequest,
     LinkResponse,
     ResolveRequest,
@@ -67,9 +67,9 @@ class SyncMapperController(BaseController):
             )
             return error_response
 
-        single_link_responses: list[
-            SingleLinkResponse
-        ] = await self.mapper_service.link(link_request)
+        single_link_responses: list[SingleLinkResponse] = (
+            await self.mapper_service.link(link_request)
+        )
         return SyncResponseHelper.get_component().construct_success_sync_link_response(
             link_request,
             single_link_responses,
@@ -89,9 +89,9 @@ class SyncMapperController(BaseController):
             )
             return error_response
 
-        single_update_responses: list[
-            SingleUpdateResponse
-        ] = await self.mapper_service.update(update_request)
+        single_update_responses: list[SingleUpdateResponse] = (
+            await self.mapper_service.update(update_request)
+        )
         return (
             SyncResponseHelper.get_component().construct_success_sync_update_response(
                 update_request,
@@ -113,9 +113,9 @@ class SyncMapperController(BaseController):
             )
             return error_response
 
-        single_resolve_responses: list[
-            SingleResolveResponse
-        ] = await self.mapper_service.resolve(resolve_request)
+        single_resolve_responses: list[SingleResolveResponse] = (
+            await self.mapper_service.resolve(resolve_request)
+        )
         return (
             SyncResponseHelper.get_component().construct_success_sync_resolve_response(
                 resolve_request,
@@ -137,9 +137,9 @@ class SyncMapperController(BaseController):
             )
             return error_response
 
-        single_unlink_responses: list[
-            SingleResolveResponse
-        ] = await self.mapper_service.unlink(unlink_request)
+        single_unlink_responses: list[SingleResolveResponse] = (
+            await self.mapper_service.unlink(unlink_request)
+        )
         return (
             SyncResponseHelper.get_component().construct_success_sync_unlink_response(
                 unlink_request,
