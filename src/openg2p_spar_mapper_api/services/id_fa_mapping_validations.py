@@ -10,7 +10,7 @@ from openg2p_g2pconnect_mapper_lib.schemas import (
     UnlinkStatusReasonCode,
     UpdateStatusReasonCode,
 )
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, select
 
 from ..models import IdFaMapping
 from .exceptions import (

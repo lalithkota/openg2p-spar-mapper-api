@@ -24,7 +24,7 @@ from openg2p_g2pconnect_mapper_lib.schemas import (
     UpdateRequestMessage,
     UpdateStatusReasonCode,
 )
-from sqlalchemy import and_, delete, select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from ..config import Settings
