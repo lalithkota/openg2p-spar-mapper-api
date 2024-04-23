@@ -101,17 +101,14 @@ class IdFaMappingValidations(BaseService):
     ) -> None:
         if not single_resolve_request.id and not single_resolve_request.fa:
             raise ResolveValidationException(
-                message="Either ID or FA are required",
+                message="ID is required",
                 status=StatusEnum.rjct,
                 validation_error_type=ResolveStatusReasonCode.rjct_reference_id_invalid,
             )
 
         result = await connection.execute(
             select(IdFaMapping).where(
-                or_(
-                    IdFaMapping.id_value == single_resolve_request.id,
-                    IdFaMapping.fa_value == single_resolve_request.fa,
-                )
+                IdFaMapping.id_value == single_resolve_request.id,
             )
         )
         resolve_request_from_db = result.first()

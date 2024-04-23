@@ -134,7 +134,7 @@ class MapperService(BaseService):
 
                 except UpdateValidationException as e:
                     UpdateValidationException(
-                        message="Mapping doesnt exist against given ID. Use 'link' instead.",
+                        message="Mapping doesn't exist against the given ID.",
                         status=StatusEnum.rjct,
                         validation_error_type=UpdateStatusReasonCode.rjct_id_invalid,
                     )
@@ -250,72 +250,34 @@ class MapperService(BaseService):
             single_resolve_request
         )
         if result:
-            single_response.status = StatusEnum.succ
             if single_resolve_request.scope == ResolveScope.details:
+                single_response.status = StatusEnum.succ
+                single_response.additional_info = result.additional_info
                 single_response.fa = result.fa_value
                 single_response.id = result.id_value
-                single_response.additional_info = (
-                    list(result.additional_info) if result.additional_info else None
-                )
-            elif single_resolve_request.scope == ResolveScope.yes_no:
-                pass
-            if single_resolve_request.fa and not single_resolve_request.id:
                 single_response.status_reason_code = (
-                    ResolveStatusReasonCode.succ_fa_active
+                    ResolveStatusReasonCode.succ_id_active
                 )
             else:
+                single_response.status = StatusEnum.succ
                 single_response.status_reason_code = (
                     ResolveStatusReasonCode.succ_id_active
                 )
         else:
-            if single_resolve_request.id and single_resolve_request.fa:
-                single_response.status_reason_code = (
-                    ResolveStatusReasonCode.succ_fa_not_linked_to_id
-                )
-                single_response.status_reason_message = (
-                    "No mapping found for given FA and ID combination."
-                )
-            elif single_resolve_request.fa:
-                single_response.status_reason_code = (
-                    ResolveStatusReasonCode.succ_fa_not_found
-                )
-                single_response.status_reason_message = (
-                    "Mapping not found against given FA."
-                )
-            else:
-                single_response.status_reason_code = (
-                    ResolveStatusReasonCode.succ_id_not_found
-                )
-                single_response.status_reason_message = (
-                    "Mapping not found against given ID."
-                )
+            single_response.status = StatusEnum.succ
+            single_response.status_reason_code = (
+                ResolveStatusReasonCode.succ_id_not_found
+            )
+            single_response.status_reason_message = (
+                "Mapping not found against given ID."
+            )
         return single_response
 
     async def construct_query(self, session, single_resolve_request):
         self.construct_single_resolve_response_for_success(single_resolve_request)
         stmt = None
         id_query = IdFaMapping.id_value == single_resolve_request.id
-        fa_query = IdFaMapping.fa_value == single_resolve_request.fa
-        if (
-            single_resolve_request.id
-            and single_resolve_request.id.endswith("@")
-            and ":" in single_resolve_request.id
-        ):
-            id_query = IdFaMapping.id_value.like(f"%{single_resolve_request.id}%")
-        if (
-            single_resolve_request.fa
-            and single_resolve_request.fa.endswith("@")
-            and ":" in single_resolve_request.fa
-        ):
-            fa_query = IdFaMapping.fa_value.like(f"%{single_resolve_request.fa}%")
-
-        if single_resolve_request.id and single_resolve_request.fa:
-            stmt = select(IdFaMapping).where(and_(id_query, fa_query))
-        elif single_resolve_request.id:
-            stmt = select(IdFaMapping).where(id_query)
-        elif single_resolve_request.fa:
-            stmt = select(IdFaMapping).where(fa_query)
-
+        stmt = select(IdFaMapping).where(id_query)
         result = await session.execute(stmt)
         result = result.scalar()
         return stmt, result
@@ -329,7 +291,7 @@ class MapperService(BaseService):
             status=StatusEnum.succ,
             status_reason_code=None,
             status_reason_message=None,
-            additional_info=None,
+            additional_info=single_resolve_request.additional_info,
             locale=single_resolve_request.locale,
         )
 
