@@ -131,27 +131,22 @@ class IdFaMappingValidations(BaseService):
                 validation_error_type=UnlinkStatusReasonCode.rjct_id_invalid,
             )
 
-        if not single_unlink_request.fa:
-            raise UnlinkValidationException(
-                message="FA is null",
-                status=StatusEnum.rjct,
-                validation_error_type=UnlinkStatusReasonCode.rjct_fa_invalid,
-            )
         result = await connection.execute(
             select(IdFaMapping).where(
-                and_(
-                    IdFaMapping.id_value == single_unlink_request.id,
-                    IdFaMapping.fa_value == single_unlink_request.fa,
-                )
+                IdFaMapping.id_value == single_unlink_request.id,
             )
         )
+
+        if single_unlink_request.fa:
+            result = result.where(IdFaMapping.fa_value == single_unlink_request.fa)
+
         unlink_request_from_db = result.first()
 
         if not unlink_request_from_db:
             raise UnlinkValidationException(
                 message="ID doesnt exist please link first",
                 status=StatusEnum.rjct,
-                validation_error_type=UnlinkStatusReasonCode.rjct_reference_id_duplicate,
+                validation_error_type=UnlinkStatusReasonCode.rjct_id_invalid,
             )
 
         return None

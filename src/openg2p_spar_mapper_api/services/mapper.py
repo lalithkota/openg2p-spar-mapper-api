@@ -338,16 +338,6 @@ class MapperService(BaseService):
             await session.commit()
         return single_unlink_responses
 
-    def unlink_id_fa_mapping(self, single_unlink_request):
-        return IdFaMapping(
-            id_value=single_unlink_request.id,
-            fa_value=single_unlink_request.fa,
-            name=single_unlink_request.name,
-            phone=single_unlink_request.phone_number,
-            additional_info=single_unlink_request.additional_info,
-            active=True,
-        )
-
     def construct_single_unlink_response_for_success(self, single_unlink_request):
         return SingleUnlinkResponse(
             reference_id=single_unlink_request.reference_id,
