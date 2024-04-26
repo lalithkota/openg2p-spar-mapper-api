@@ -11,6 +11,6 @@ module_name: openg2p_spar_mapper_api
 org_name: OpenG2P
 org_slug: OpenG2P
 package_name: openg2p-spar-mapper-api
-repo_name: OpenG2P SPAR Mapper API
-repo_slug: openg2p-spar-mapper-api
+repo_name: OpenG2P SPAR Mapper
+repo_slug: openg2p-spar-mapper
 
