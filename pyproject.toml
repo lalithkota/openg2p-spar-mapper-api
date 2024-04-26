@@ -7,7 +7,7 @@ name = "openg2p-spar-mapper-api"
 authors = [
   { name="OpenG2P", email="info@openg2p.org" },
 ]
-description = "SPAR G2P Connect ID Mapper"
+description = "SPAR Mapper compliant with G2P Connect APIs"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
@@ -16,9 +16,9 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 dependencies = [
-    "openg2p-fastapi-common",
-    "openg2p-g2pconnect-common-lib",
-    "openg2p-g2pconnect-mapper-lib",
+  "openg2p-fastapi-common",
+  "openg2p-g2pconnect-common-lib",
+  "openg2p-g2pconnect-mapper-lib",
 ]
 dynamic = ["version"]
 
