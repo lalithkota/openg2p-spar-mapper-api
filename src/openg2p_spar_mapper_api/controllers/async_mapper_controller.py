@@ -155,9 +155,9 @@ class AsyncMapperController(BaseController):
             RequestValidation.get_component().validate_link_async_request_header(
                 link_request
             )
-            single_link_responses: list[SingleLinkResponse] = (
-                await self.action_to_method[action](link_request)
-            )
+            single_link_responses: list[
+                SingleLinkResponse
+            ] = await self.action_to_method[action](link_request)
 
             async_call_back_request: (
                 AsyncCallbackRequest
@@ -188,9 +188,9 @@ class AsyncMapperController(BaseController):
             RequestValidation.get_component().validate_update_async_request_header(
                 request
             )
-            single_update_responses: list[SingleUpdateResponse] = (
-                await self.action_to_method[action](request)
-            )
+            single_update_responses: list[
+                SingleUpdateResponse
+            ] = await self.action_to_method[action](request)
             async_call_back_request: (
                 AsyncCallbackRequest
             ) = AsyncResponseHelper.get_component().construct_success_async_callback_update_request(
@@ -220,9 +220,9 @@ class AsyncMapperController(BaseController):
             RequestValidation.get_component().validate_resolve_async_request_header(
                 request
             )
-            single_resolve_responses: list[SingleResolveResponse] = (
-                await self.action_to_method[action](request)
-            )
+            single_resolve_responses: list[
+                SingleResolveResponse
+            ] = await self.action_to_method[action](request)
             async_call_back_request: (
                 AsyncCallbackRequest
             ) = AsyncResponseHelper.get_component().construct_success_async_callback_resolve_request(
@@ -252,9 +252,9 @@ class AsyncMapperController(BaseController):
             RequestValidation.get_component().validate_unlink_async_request_header(
                 request
             )
-            single_unlink_responses: list[SingleUnlinkResponse] = (
-                await self.action_to_method[action](request)
-            )
+            single_unlink_responses: list[
+                SingleUnlinkResponse
+            ] = await self.action_to_method[action](request)
             async_call_back_request: (
                 AsyncCallbackRequest
             ) = AsyncResponseHelper.get_component().construct_success_async_callback_unlink_request(
