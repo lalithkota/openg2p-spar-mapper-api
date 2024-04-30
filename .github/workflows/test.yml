@@ -45,4 +45,4 @@ jobs:
         run: |
           pytest --cov-branch --cov=openg2p_spar_mapper_api --cov=tests --cov-report=term-missing
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v1
