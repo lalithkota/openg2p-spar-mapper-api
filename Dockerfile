@@ -22,10 +22,9 @@ ADD --chown=${container_user}:${container_user_group} main.py /app
 RUN python3 -m venv venv \
   && . ./venv/bin/activate
 RUN python3 -m pip install \
-  git+https://github.com/openg2p/openg2p-fastapi-common.git@develop\#egg=openg2p-fastapi-common\&subdirectory=openg2p-fastapi-common \
-  git+https://github.com/openg2p/openg2p-fastapi-common.git@develop\#egg=openg2p-fastapi-auth\&subdirectory=openg2p-fastapi-auth \
-  git+https://github.com/OpenG2P/openg2p-g2pconnect-common@develop\#egg=openg2p-g2pconnect-common-lib\&subdirectory=openg2p-g2pconnect-common-lib \
-  git+https://github.com/OpenG2P/openg2p-g2pconnect-common@develop\#egg=openg2p-g2pconnect-mapper-lib\&subdirectory=openg2p-g2pconnect-mapper-lib \
+  git+https://github.com/openg2p/openg2p-fastapi-common@develop\#subdirectory=openg2p-fastapi-common \
+  git+https://github.com/OpenG2P/openg2p-g2pconnect-common-lib@develop\#subdirectory=openg2p-g2pconnect-common-lib \
+  git+https://github.com/OpenG2P/openg2p-g2pconnect-common-lib@develop\#subdirectory=openg2p-g2pconnect-mapper-lib \
   ./src
 
 CMD python3 main.py migrate; \

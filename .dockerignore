@@ -1,6 +1,6 @@
 # Git
 .git
-src/openg2p_spar_mapper_api/.gitignore
+.gitignore
 .gitattributes
 
 
