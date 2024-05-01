@@ -1,0 +1,2342 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenG2P SPAR Account Mapper",
+    "description": "\n    This module maps the beneficiary ID to a Financial Address.\n\n    ***********************************\n    Further details goes here\n    ***********************************\n    ",
+    "contact": {
+      "url": "https://www.openg2p.org/",
+      "email": "info@openg2p.org"
+    },
+    "license": {
+      "name": "Mozilla Public License 2.0",
+      "url": "https://www.mozilla.org/en-US/MPL/2.0/"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/sync/link": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Sync"
+        ],
+        "summary": "Link Sync",
+        "operationId": "link_sync_sync_link_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sync/update": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Sync"
+        ],
+        "summary": "Update Sync",
+        "operationId": "update_sync_sync_update_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sync/resolve": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Sync"
+        ],
+        "summary": "Resolve Sync",
+        "operationId": "resolve_sync_sync_resolve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolveResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sync/unlink": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Sync"
+        ],
+        "summary": "Unlink Sync",
+        "operationId": "unlink_sync_sync_unlink_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnlinkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/async/link": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Async"
+        ],
+        "summary": "Link Async",
+        "operationId": "link_async_async_link_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/async/update": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Async"
+        ],
+        "summary": "Update Async",
+        "operationId": "update_async_async_update_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/async/resolve": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Async"
+        ],
+        "summary": "Resolve Async",
+        "operationId": "resolve_async_async_resolve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/async/unlink": {
+      "post": {
+        "tags": [
+          "G2PConnect Mapper Async"
+        ],
+        "summary": "Unlink Async",
+        "operationId": "unlink_async_async_unlink_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "tags": [
+          "ping"
+        ],
+        "summary": "Get Ping",
+        "description": "Returns \"pong\" always, if the service is healthy.\nThis can also used for service health checks.",
+        "operationId": "get_ping_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountProviderInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "subcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subcode"
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "code",
+          "subcode"
+        ],
+        "title": "AccountProviderInfo"
+      },
+      "AsyncAck": {
+        "type": "string",
+        "enum": [
+          "ACK",
+          "NACK",
+          "ERR"
+        ],
+        "title": "AsyncAck"
+      },
+      "AsyncResponse": {
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/AsyncResponseMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "AsyncResponse"
+      },
+      "AsyncResponseMessage": {
+        "properties": {
+          "ack_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AsyncAck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp"
+        ],
+        "title": "AsyncResponseMessage"
+      },
+      "ErrorListResponse": {
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "type": "array",
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "title": "ErrorListResponse"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "default": ""
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "ErrorResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LinkRequest": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RequestHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/LinkRequestMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "LinkRequest"
+      },
+      "LinkRequestMessage": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "title": "Transaction Id"
+          },
+          "link_request": {
+            "items": {
+              "$ref": "#/components/schemas/SingleLinkRequest"
+            },
+            "type": "array",
+            "title": "Link Request"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_id",
+          "link_request"
+        ],
+        "title": "LinkRequestMessage"
+      },
+      "LinkResponse": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/SyncResponseHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/LinkResponseMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "LinkResponse"
+      },
+      "LinkResponseMessage": {
+        "properties": {
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id"
+          },
+          "link_response": {
+            "items": {
+              "$ref": "#/components/schemas/SingleLinkResponse"
+            },
+            "type": "array",
+            "title": "Link Response"
+          }
+        },
+        "type": "object",
+        "required": [
+          "link_response"
+        ],
+        "title": "LinkResponseMessage"
+      },
+      "LinkStatusReasonCode": {
+        "type": "string",
+        "enum": [
+          "rjct.reference_id.invalid",
+          "rjct.reference_id.duplicate",
+          "rjct.timestamp.invalid",
+          "rjct.id.invalid",
+          "rjct.fa.invalid",
+          "rjct.name.invalid",
+          "rjct.mobile_number.invalid",
+          "rjct.unknown.retry",
+          "rjct.other.error"
+        ],
+        "title": "LinkStatusReasonCode"
+      },
+      "RequestHeader": {
+        "properties": {
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "default": "1.0.0"
+          },
+          "message_id": {
+            "type": "string",
+            "title": "Message Id"
+          },
+          "message_ts": {
+            "type": "string",
+            "title": "Message Ts"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "sender_id": {
+            "type": "string",
+            "title": "Sender Id"
+          },
+          "sender_uri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Uri",
+            "default": ""
+          },
+          "receiver_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receiver Id",
+            "default": ""
+          },
+          "total_count": {
+            "type": "integer",
+            "title": "Total Count"
+          },
+          "is_msg_encrypted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Msg Encrypted",
+            "default": false
+          },
+          "meta": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message_id",
+          "message_ts",
+          "action",
+          "sender_id",
+          "total_count"
+        ],
+        "title": "RequestHeader"
+      },
+      "ResolveRequest": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RequestHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ResolveRequestMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "ResolveRequest"
+      },
+      "ResolveRequestMessage": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "title": "Transaction Id"
+          },
+          "resolve_request": {
+            "items": {
+              "$ref": "#/components/schemas/SingleResolveRequest"
+            },
+            "type": "array",
+            "title": "Resolve Request"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_id",
+          "resolve_request"
+        ],
+        "title": "ResolveRequestMessage"
+      },
+      "ResolveResponse": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/SyncResponseHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ResolveResponseMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "ResolveResponse"
+      },
+      "ResolveResponseMessage": {
+        "properties": {
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id",
+            "default": ""
+          },
+          "resolve_response": {
+            "items": {
+              "$ref": "#/components/schemas/SingleResolveResponse"
+            },
+            "type": "array",
+            "title": "Resolve Response"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolve_response"
+        ],
+        "title": "ResolveResponseMessage"
+      },
+      "ResolveScope": {
+        "type": "string",
+        "enum": [
+          "yes_no",
+          "details"
+        ],
+        "title": "ResolveScope"
+      },
+      "ResolveStatusReasonCode": {
+        "type": "string",
+        "enum": [
+          "rjct.reference_id.invalid",
+          "rjct.reference_id.duplicate",
+          "rjct.timestamp.invalid",
+          "rjct.id.invalid",
+          "rjct.fa.invalid",
+          "rjct.resolve_type.not_supported",
+          "succ.fa.active",
+          "succ.fa.inactive",
+          "succ.fa.not_found",
+          "succ.fa.not_linked_to_id",
+          "succ.id.active",
+          "succ.id.inactive",
+          "succ.id.not_found"
+        ],
+        "title": "ResolveStatusReasonCode"
+      },
+      "SingleLinkRequest": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "fa": {
+            "type": "string",
+            "title": "Fa"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "id",
+          "fa"
+        ],
+        "title": "SingleLinkRequest"
+      },
+      "SingleLinkResponse": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fa"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEnum"
+          },
+          "status_reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LinkStatusReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_reason_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason Message"
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "status"
+        ],
+        "title": "SingleLinkResponse"
+      },
+      "SingleResolveRequest": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fa",
+            "default": ""
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "default": ""
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResolveScope"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "yes_no"
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp"
+        ],
+        "title": "SingleResolveRequest"
+      },
+      "SingleResolveResponse": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fa"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "account_provider_info": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AccountProviderInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEnum"
+          },
+          "status_reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResolveStatusReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_reason_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason Message",
+            "default": ""
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "status"
+        ],
+        "title": "SingleResolveResponse"
+      },
+      "SingleUnlinkRequest": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fa"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "id"
+        ],
+        "title": "SingleUnlinkRequest"
+      },
+      "SingleUnlinkResponse": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "default": ""
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEnum"
+          },
+          "status_reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UnlinkStatusReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_reason_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason Message",
+            "default": ""
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "status"
+        ],
+        "title": "SingleUnlinkResponse"
+      },
+      "SingleUpdateRequest": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "fa": {
+            "type": "string",
+            "title": "Fa"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "id",
+          "fa"
+        ],
+        "title": "SingleUpdateRequest"
+      },
+      "SingleUpdateResponse": {
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "title": "Reference Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "default": ""
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEnum"
+          },
+          "status_reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UpdateStatusReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_reason_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason Message",
+            "default": ""
+          },
+          "additional_info": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Info"
+          },
+          "locale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference_id",
+          "timestamp",
+          "status"
+        ],
+        "title": "SingleUpdateResponse"
+      },
+      "StatusEnum": {
+        "type": "string",
+        "enum": [
+          "rcvd",
+          "pdng",
+          "succ",
+          "rjct"
+        ],
+        "title": "StatusEnum"
+      },
+      "SyncResponseHeader": {
+        "properties": {
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "default": "1.0.0"
+          },
+          "message_id": {
+            "type": "string",
+            "title": "Message Id"
+          },
+          "message_ts": {
+            "type": "string",
+            "title": "Message Ts"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusEnum"
+          },
+          "status_reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SyncResponseStatusReasonCodeEnum"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status_reason_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason Message",
+            "default": ""
+          },
+          "total_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Count"
+          },
+          "completed_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed Count"
+          },
+          "sender_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender Id"
+          },
+          "receiver_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receiver Id"
+          },
+          "is_msg_encrypted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Msg Encrypted",
+            "default": false
+          },
+          "meta": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "message_id",
+          "message_ts",
+          "action",
+          "status"
+        ],
+        "title": "SyncResponseHeader"
+      },
+      "SyncResponseStatusReasonCodeEnum": {
+        "type": "string",
+        "enum": [
+          "rjct.version.invalid",
+          "rjct.message_id.duplicate",
+          "rjct.message_ts.invalid",
+          "rjct.action.invalid",
+          "rjct.action.not_supported",
+          "rjct.total_count.invalid",
+          "rjct.total_count.limit_exceeded",
+          "rjct.errors.too_many"
+        ],
+        "title": "SyncResponseStatusReasonCodeEnum"
+      },
+      "UnlinkRequest": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RequestHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/UnlinkRequestMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "UnlinkRequest"
+      },
+      "UnlinkRequestMessage": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "title": "Transaction Id"
+          },
+          "unlink_request": {
+            "items": {
+              "$ref": "#/components/schemas/SingleUnlinkRequest"
+            },
+            "type": "array",
+            "title": "Unlink Request"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_id",
+          "unlink_request"
+        ],
+        "title": "UnlinkRequestMessage"
+      },
+      "UnlinkResponse": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/SyncResponseHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/UnlinkResponseMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "UnlinkResponse"
+      },
+      "UnlinkResponseMessage": {
+        "properties": {
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id",
+            "default": ""
+          },
+          "unlink_response": {
+            "items": {
+              "$ref": "#/components/schemas/SingleUnlinkResponse"
+            },
+            "type": "array",
+            "title": "Unlink Response"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unlink_response"
+        ],
+        "title": "UnlinkResponseMessage"
+      },
+      "UnlinkStatusReasonCode": {
+        "type": "string",
+        "enum": [
+          "rjct.reference_id.invalid",
+          "rjct.id.invalid",
+          "rjct.fa.invalid",
+          "rjct.reference_id.duplicate",
+          "rjct.timestamp.invalid",
+          "rjct.beneficiary_name.invalid"
+        ],
+        "title": "UnlinkStatusReasonCode"
+      },
+      "UpdateRequest": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RequestHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/UpdateRequestMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "UpdateRequest"
+      },
+      "UpdateRequestMessage": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "title": "Transaction Id"
+          },
+          "update_request": {
+            "items": {
+              "$ref": "#/components/schemas/SingleUpdateRequest"
+            },
+            "type": "array",
+            "title": "Update Request"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_id",
+          "update_request"
+        ],
+        "title": "UpdateRequestMessage"
+      },
+      "UpdateResponse": {
+        "properties": {
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "header": {
+            "$ref": "#/components/schemas/SyncResponseHeader"
+          },
+          "message": {
+            "$ref": "#/components/schemas/UpdateResponseMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "header",
+          "message"
+        ],
+        "title": "UpdateResponse"
+      },
+      "UpdateResponseMessage": {
+        "properties": {
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id",
+            "default": ""
+          },
+          "update_response": {
+            "items": {
+              "$ref": "#/components/schemas/SingleUpdateResponse"
+            },
+            "type": "array",
+            "title": "Update Response"
+          }
+        },
+        "type": "object",
+        "required": [
+          "update_response"
+        ],
+        "title": "UpdateResponseMessage"
+      },
+      "UpdateStatusReasonCode": {
+        "type": "string",
+        "enum": [
+          "rjct.reference_id.invalid",
+          "rjct.reference_id.duplicate",
+          "rjct.timestamp.invalid",
+          "rjct.beneficiary_name.invalid",
+          "rjct.id.invalid",
+          "rjct.fa.invalid"
+        ],
+        "title": "UpdateStatusReasonCode"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
