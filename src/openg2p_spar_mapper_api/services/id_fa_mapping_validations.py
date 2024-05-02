@@ -44,10 +44,7 @@ class IdFaMappingValidations(BaseService):
         # Check if the ID is already mapped
         result = await connection.execute(
             select(IdFaMapping).where(
-                and_(
-                    IdFaMapping.id_value == single_link_request.id,
-                    IdFaMapping.fa_value == single_link_request.fa,
-                )
+                IdFaMapping.id_value == single_link_request.id,
             )
         )
         link_request_from_db = result.first()
