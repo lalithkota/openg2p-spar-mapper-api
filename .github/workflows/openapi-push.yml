@@ -2,6 +2,8 @@ name: openapi publish on push
 
 on:
   push:
+    tags-ignore:
+      - '**'
   workflow_dispatch:
 
 jobs:

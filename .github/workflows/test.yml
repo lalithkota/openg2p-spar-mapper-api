@@ -3,6 +3,8 @@ name: Test and coverage
 on:
   pull_request:
   push:
+    tags-ignore:
+      - '**'
   workflow_dispatch:
 
 concurrency:
