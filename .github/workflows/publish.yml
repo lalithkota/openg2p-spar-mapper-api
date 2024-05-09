@@ -1,9 +1,11 @@
 name: Publish to PyPI
 
 on:
-  release:
-    types:
-      - created
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - '**'
   workflow_dispatch:
 
 jobs:
