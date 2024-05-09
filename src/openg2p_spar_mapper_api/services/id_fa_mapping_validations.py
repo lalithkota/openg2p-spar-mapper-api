@@ -135,7 +135,12 @@ class IdFaMappingValidations(BaseService):
         )
 
         if single_unlink_request.fa:
-            result = result.where(IdFaMapping.fa_value == single_unlink_request.fa)
+            result = await connection.execute(
+                select(IdFaMapping).where(
+                    IdFaMapping.id_value == single_unlink_request.id,
+                    IdFaMapping.fa_value == single_unlink_request.fa,
+                )
+            )
 
         unlink_request_from_db = result.first()
 
