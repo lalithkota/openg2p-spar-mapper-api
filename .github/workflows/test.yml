@@ -3,6 +3,10 @@ name: Test and coverage
 on:
   pull_request:
   push:
+    branches:
+      - "**"
+    tags-ignore:
+      - '**'
   workflow_dispatch:
 
 concurrency:
@@ -44,5 +48,7 @@ jobs:
       - name: Run test suite
         run: |
           pytest --cov-branch --cov=openg2p_spar_mapper_api --cov=tests --cov-report=term-missing
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

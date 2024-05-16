@@ -168,10 +168,7 @@ class MapperService(BaseService):
             if single_update_request.phone_number:
                 result.phone = single_update_request.phone_number
             if single_update_request.additional_info:
-                addl_info_copy = (
-                    result.additional_info.copy() if result.additional_info else []
-                )
-                result.additional_info = addl_info_copy
+                result.additional_info = single_update_request.additional_info
         else:
             single_response.status = StatusEnum.rjct
             single_response.status_reason_code = UpdateStatusReasonCode.rjct_id_invalid
